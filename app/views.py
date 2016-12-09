@@ -1,4 +1,4 @@
-from flask import jsonify, make_response, request, url_for, render_template, session
+from flask import abort, jsonify, make_response, request, url_for, render_template, session
 from app import app, db
 from .models import Question
 import random
@@ -59,17 +59,17 @@ def not_found(error):
 @app.route('/')
 @app.route('/tossup')
 def tossup():
-    question = random.choice([make_public(q) for q in Question.query.all()])
+    question = random.choice(list(Question.query.all()))
     session['question_id'] = question.id
-    return render_template('tossup.html', question_type='tossup', question=question, settings=session, categories=categories, sources=sources)
+    return render_template('tossup.html', question_type='tossup', question=question, settings=session)
 
 @app.route('/bonus')
 def bonus():
     if 'question_id' in session:
-        question = make_public(Question.query.get(session['question_id']))
-    else: 
-       question = random.choice([q.id for q in Question.query.all()])
-    return render_template('bonus.html', question_type='bonus', question=question, settings=session, categories=categories, sources=sources)
+        question = Question.query.get(session['question_id'])
+    else:
+       question = random.choice(list(Question.query.all()))
+    return render_template('bonus.html', question_type='bonus', question=question, settings=session)
 
 # set the secret key.  keep this really secret: (put somewhere more private in the future)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
