@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Bonus - {{ question['category'] }} - {{ question['bonus_format'] }}</h1>
+    <div><pre>{{ question['bonus_question'] }}</pre></div>
+    <hr>
+    <div><pre>ANSWER: {{ question['bonus_answer'] }}</pre></div>
+    <div><a href="/tossup">Toss Up</a></div>
+{% endblock %}
