@@ -1,4 +1,4 @@
-from flask import abort, jsonify, make_response, request, url_for, render_template, session
+from flask import abort, jsonify, make_response, request, url_for, render_template, session, redirect
 from app import app, db
 from .models import Question
 import random
@@ -40,7 +40,7 @@ def get_random_question_filtered():
         params['category'] = request.json['category']
     if 'source' in request.json:
         params['source'] = request.json['source']
-    questions = Question.query.filter_by(**params).all()
+    questions = Question.query.filter(**params).all()
     return jsonify({'question': random.choice([make_public(q) for q in questions])})
 
 def make_public(question):
@@ -59,7 +59,19 @@ def not_found(error):
 @app.route('/')
 @app.route('/tossup')
 def tossup():
-    question = random.choice(list(Question.query.all()))
+    # filter questions by category and source
+    if len(session['categories']) > 0:
+        questions = list(Question.query.filter(Question.category.in_(session['categories'])))
+    else: 
+        questions = list(Question.query.all())
+    if len(session['sources']) > 0:
+        questions = [q for q in questions if q.source.startswith(tuple(session['sources']))]
+    # reset settings if they filter out all questions, for example if the source does not contain any questions of a particular category
+    if len(questions) == 0:
+        questions=list(Question.query.all())
+        session['categories'] = []
+        session['sources'] =[]
+    question = random.choice(questions)
     session['question_id'] = question.id
     return render_template('tossup.html', question_type='tossup', question=question, settings=session)
 
@@ -71,5 +83,11 @@ def bonus():
        question = random.choice(list(Question.query.all()))
     return render_template('bonus.html', question_type='bonus', question=question, settings=session)
 
-# set the secret key.  keep this really secret: (put somewhere more private in the future)
+@app.route('/settings', methods=['POST'])
+def settings():
+    session['categories'] = request.form.getlist('category')
+    session['sources'] = request.form.getlist('source')
+    return redirect(url_for('tossup'))
+
+# set the secret key. keep this really secret (put somewhere more private in the future)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
