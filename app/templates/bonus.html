@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Bonus - {{ question['category'] }} - {{ question['bonus_format'] }}</h1>
-    <div><pre>{{ question['bonus_question'] }}</pre></div>
-    <hr>
-    <div><pre>ANSWER: {{ question['bonus_answer'] }}</pre></div>
-    <div><a href="/tossup">Toss Up</a></div>
+<h2>Bonus - {{ question['category'] }} - {{ question['bonus_format'] }}</h2>
+<div class="well well-sm">
+    <p>{{ question['bonus_question']|safe  }}</p>
+</div>
+<div class="well well-sm">
+    <p>ANSWER: {{ question['bonus_answer'] }}</p>
+    <small>From {{ question['source'] }}</small>
+</div>
+<a class="btn btn-primary btn-block" href="{{ url_for('tossup') }}">Toss Up</a>
 {% endblock %}

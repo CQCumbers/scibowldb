@@ -1,25 +1,26 @@
+<h4>Settings</h4>
 <form action="{{ url_for('settings') }}" method="post">
-    <select multiple name="category">
-        <option value="PHSYICS" {% if "PHSYICS" in settings.categories %} selected="selected" {% endif %}>Physics</option>
-        <option value="GENERAL SCIENCE" {% if "GENERAL SCIENCE" in settings.categories %} selected="selected" {% endif %}>General Science</option>
-        <option value="ENERGY" {% if "ENERGY" in settings.categories %} selected="selected" {% endif %}>Energy</option>
-        <option value="EARTH AND SPACE" {% if "EARTH AND SPACE" in settings.categories %} selected="selected" {% endif %}>Earth and Space</option>
-        <option value="EARTH SCIENCE" {% if "EARTH SCIENCE" in settings.categories %} selected="selected" {% endif %}>Earth Science</option>
-        <option value="CHEMISTRY" {% if "CHEMISTRY" in settings.categories %} selected="selected" {% endif %}>Chemistry</option>
-        <option value="BIOLOGY" {% if "BIOLOGY" in settings.categories %} selected="selected" {% endif %}>Biology</option>
-        <option value="ASTRONOMY" {% if "ASTRONOMY" in settings.categories %} selection="selected" {% endif %}>Astronomy</option>
-    </select>
-    <select multiple name="source">
-        <option value="NSB-set" {% if "NSB-set" in settings.sources %} selected="selected" {% endif %}>Official</option>
-        <option value="CSUB-" {% if "CSUB-" in settings.sources %} selected="selected" {% endif %}>CSUB</option>
-        <option value="05Nats-" {% if "O5Nats-" in settings.sources %} selected="selected" {% endif %}>'05 Nats</option>
-        <option value="98Nats-" {% if "98Nats-" in settings.sources %} selected="selected" {% endif %}>'98 Nats</option>
-    </select>
-    <input type="submit" value="Submit">
-    {% for category in settings.categories %}
-    <p>{{ category }}</p>
-    {% endfor %}
-    {% for source in settings.sources %}
-    <p>{{ source }}</p>
-    {% endfor %}
+    <div class="form-group">
+        <label for="categoryselect">Categories</label>
+        <select multiple id="categoryselect" name="category" class="selectpicker" data-actions-box="true">
+            <option value="PHSYICS" {% if "PHSYICS" in settings.categories %} selected="selected" {% endif %}>Physics</option>
+            <option value="GENERAL SCIENCE" {% if "GENERAL SCIENCE" in settings.categories %} selected="selected" {% endif %}>General Science</option>
+            <option value="ENERGY" {% if "ENERGY" in settings.categories %} selected="selected" {% endif %}>Energy</option>
+            <option value="EARTH AND SPACE" {% if "EARTH AND SPACE" in settings.categories %} selected="selected" {% endif %}>Earth and Space</option>
+            <option value="EARTH SCIENCE" {% if "EARTH SCIENCE" in settings.categories %} selected="selected" {% endif %}>Earth Science</option>
+            <option value="CHEMISTRY" {% if "CHEMISTRY" in settings.categories %} selected="selected" {% endif %}>Chemistry</option>
+            <option value="BIOLOGY" {% if "BIOLOGY" in settings.categories %} selected="selected" {% endif %}>Biology</option>
+            <option value="ASTRONOMY" {% if "ASTRONOMY" in settings.categories %} selection="selected" {% endif %}>Astronomy</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="sourceselect">Sources</label>
+        <select multiple id="sourceselect" name="source" class="selectpicker" data-actions-box="true">
+            <option value="NSB-set" {% if "NSB-set" in settings.sources %} selected="selected" {% endif %}>Official</option>
+            <option value="CSUB-" {% if "CSUB-" in settings.sources %} selected="selected" {% endif %}>CSUB</option>
+            <option value="05Nats-" {% if "O5Nats-" in settings.sources %} selected="selected" {% endif %}>'05 Nats</option>
+            <option value="98Nats-" {% if "98Nats-" in settings.sources %} selected="selected" {% endif %}>'98 Nats</option>
+        </select>
+        </div>
+    <button type="submit" class="btn btn-default">Submit</button>
 </form>

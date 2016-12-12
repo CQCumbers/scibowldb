@@ -1,5 +1,6 @@
 from flask import abort, jsonify, make_response, request, url_for, render_template, session, redirect
 from app import app, db
+import re
 from .models import Question
 import random
 
@@ -43,13 +44,16 @@ def get_random_question_filtered():
     questions = Question.query.filter(**params).all()
     return jsonify({'question': random.choice([make_public(q) for q in questions])})
 
-def make_public(question):
+def make_public(question, html=False):
     new_question = {}
     for field in question.as_dict():
         if field == 'id':
             new_question['uri'] = url_for('get_question', question_id=question.id, _external=True)
         else:
             new_question[field] = question.as_dict()[field]
+        if html:
+            new_question['tossup_question'] = re.sub(r'\n(?P<letter>[WXYZ])', r'<br>\g<letter>', question.tossup_question)
+            new_question['bonus_question'] = re.sub(r'\n(?P<letter>[WXYZ])', r'<br>\g<letter>', question.bonus_question)
     return new_question
 
 @app.errorhandler(404)
@@ -73,7 +77,7 @@ def tossup():
         session['sources'] =[]
     question = random.choice(questions)
     session['question_id'] = question.id
-    return render_template('tossup.html', question_type='tossup', question=question, settings=session)
+    return render_template('tossup.html', question=make_public(question, html=True), settings=session)
 
 @app.route('/bonus')
 def bonus():
@@ -81,7 +85,7 @@ def bonus():
         question = Question.query.get(session['question_id'])
     else:
        question = random.choice(list(Question.query.all()))
-    return render_template('bonus.html', question_type='bonus', question=question, settings=session)
+    return render_template('bonus.html', question=make_public(question, html=True), settings=session)
 
 @app.route('/settings', methods=['POST'])
 def settings():
