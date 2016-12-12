@@ -52,8 +52,8 @@ def make_public(question, html=False):
         else:
             new_question[field] = question.as_dict()[field]
         if html:
-            new_question['tossup_question'] = re.sub(r'\n(?P<letter>[WXYZ])', r'<br>\g<letter>', question.tossup_question)
-            new_question['bonus_question'] = re.sub(r'\n(?P<letter>[WXYZ])', r'<br>\g<letter>', question.bonus_question)
+            new_question['tossup_question'] = re.sub(r'\n\(?(?P<letter>[WXYZ])', r'<br>\g<letter>', question.tossup_question)
+            new_question['bonus_question'] = re.sub(r'\n\(?(?P<letter>[WXYZ])', r'<br>\g<letter>', question.bonus_question)
     return new_question
 
 @app.errorhandler(404)
@@ -64,11 +64,11 @@ def not_found(error):
 @app.route('/tossup')
 def tossup():
     # filter questions by category and source
-    if len(session['categories']) > 0:
+    if 'categories' in session and len(session['categories']) > 0:
         questions = list(Question.query.filter(Question.category.in_(session['categories'])))
-    else: 
+    else:
         questions = list(Question.query.all())
-    if len(session['sources']) > 0:
+    if 'sources' in session and len(session['sources']) > 0:
         questions = [q for q in questions if q.source.startswith(tuple(session['sources']))]
     # reset settings if they filter out all questions, for example if the source does not contain any questions of a particular category
     if len(questions) == 0:
