@@ -1,5 +1,6 @@
-<h4>Settings</h4>
 <form action="{{ url_for('settings') }}" method="post">
+    <fieldset>
+    <legend>Settings</legend>
     <div class="form-group">
         <label for="categoryselect">Categories</label>
         <select multiple id="categoryselect" name="category" class="selectpicker" data-actions-box="true">
@@ -10,17 +11,20 @@
             <option value="EARTH SCIENCE" {% if "EARTH SCIENCE" in settings.categories %} selected="selected" {% endif %}>Earth Science</option>
             <option value="CHEMISTRY" {% if "CHEMISTRY" in settings.categories %} selected="selected" {% endif %}>Chemistry</option>
             <option value="BIOLOGY" {% if "BIOLOGY" in settings.categories %} selected="selected" {% endif %}>Biology</option>
-            <option value="ASTRONOMY" {% if "ASTRONOMY" in settings.categories %} selection="selected" {% endif %}>Astronomy</option>
+            <option value="ASTRONOMY" {% if "ASTRONOMY" in settings.categories %} selected="selected" {% endif %}>Astronomy</option>
+            <option value="MATH" {% if "MATH" in settings.categories %} selected="selected" {% endif %}>Math</option>
+            <option value="COMPUTER SCIENCE" {% if "COMPUTER SCIENCE" in settings.categories %} selected="selected" {% endif %}>Computer Science</option>
         </select>
     </div>
     <div class="form-group">
         <label for="sourceselect">Sources</label>
         <select multiple id="sourceselect" name="source" class="selectpicker" data-actions-box="true">
-            <option value="NSB-set" {% if "NSB-set" in settings.sources %} selected="selected" {% endif %}>Official</option>
-            <option value="CSUB-" {% if "CSUB-" in settings.sources %} selected="selected" {% endif %}>CSUB</option>
-            <option value="05Nats-" {% if "O5Nats-" in settings.sources %} selected="selected" {% endif %}>'05 Nats</option>
-            <option value="98Nats-" {% if "98Nats-" in settings.sources %} selected="selected" {% endif %}>'98 Nats</option>
+            <option value="official" {% if "official" in settings.sources %} selected="selected" {% endif %}>Official</option>
+            <option value="CSUB" {% if "CSUB" in settings.sources %} selected="selected" {% endif %}>CSUB</option>
+            <option value="05Nats" {% if "05Nats" in settings.sources %} selected="selected" {% endif %}>'05 Nats</option>
+            <option value="98Nats" {% if "98Nats" in settings.sources %} selected="selected" {% endif %}>'98 Nats</option>
         </select>
         </div>
     <button type="submit" class="btn btn-default">Submit</button>
+    </fieldset>
 </form>

@@ -1,4 +1,4 @@
-from flask import abort, jsonify, make_response, request, url_for, render_template, session, redirect
+from flask import abort, jsonify, make_response, request, url_for, render_template, session, redirect, flash
 from app import app, db
 import re
 from .models import Question
@@ -72,6 +72,7 @@ def tossup():
         questions = [q for q in questions if q.source.startswith(tuple(session['sources']))]
     # reset settings if they filter out all questions, for example if the source does not contain any questions of a particular category
     if len(questions) == 0:
+        flash("The inputted settings did not match any available questions")
         questions=list(Question.query.all())
         session['categories'] = []
         session['sources'] =[]
