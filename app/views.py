@@ -26,24 +26,26 @@ def get_question(question_id):
 def get_questions_filtered():
     if not request.json:
         abort(400)
-    params = {}
-    if 'category' in request.json:
-        params['category'] = request.json['category']
-    if 'source' in request.json:
-        params['source'] = request.json['source']
-    questions = Question.query.filter_by(**params)
+    # filter questions by category and source
+    if 'categories' in request.json and len(request.json['categories']) > 0:
+        questions = list(Question.query.filter(Question.category.in_(request.json['categories'])))
+    else:
+        questions = list(Question.query.all())
+    if 'sources' in request.json and len(request.json['sources']) > 0:
+        questions = [q for q in questions if q.source.startswith(tuple(request.json['sources']))]
     return jsonify({'questions': [make_public(q) for q in questions]})
 
 @app.route('/api/v1.0/questions/random', methods=['POST'])
 def get_random_question_filtered():
     if not request.json:
         abort(400)
-    params = {}
-    if 'category' in request.json:
-        params['category'] = request.json['category']
-    if 'source' in request.json:
-        params['source'] = request.json['source']
-    questions = Question.query.filter(**params).all()
+    # filter questions by category and source
+    if 'categories' in request.json and len(request.json['categories']) > 0:
+        questions = list(Question.query.filter(Question.category.in_(request.json['categories'])))
+    else:
+        questions = list(Question.query.all())
+    if 'sources' in request.json and len(request.json['sources']) > 0:
+        questions = [q for q in questions if q.source.startswith(tuple(request.json['sources']))]
     return jsonify({'question': random.choice([make_public(q) for q in questions])})
 
 def make_public(question, html=False):
@@ -108,6 +110,10 @@ def browse(page=1):
         session['categories'] = []
         session['sources'] = []
     return render_template('browse.html', questions=[make_public(question) for question in questions.items], settings=session, pagination=questions)
+
+@app.route('/about')
+def about():
+    return render_template('about.html', settings=session, num_questions=len(Question.query.all())*2)
 
 @app.route('/settings', methods=['POST'])
 def settings():
