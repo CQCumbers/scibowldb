@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Browse{% endblock %}
+{% block content %}
+    <nav class="text-center">
+        <ul class="pagination">
+            {% if pagination.has_prev %}
+                <li><a href="{{ url_for('browse', page=pagination.prev_num) }}">Previous</a></li>
+            {% else %}
+                <li class="disabled"><span>Previous</span></li>
+            {% endif %}
+            {%for page in pagination.iter_pages() %}
+                {% if page %}
+                    {% if page != pagination.page %}
+                        <li><a href="{{ url_for('browse', page=page) }}">{{ page }}</a></li>
+                    {% else %}
+                        <li class="active"><span>{{ page }}</span></li>
+                    {% endif %}
+                {% else %}
+                    <li class="disabled"><span class=ellipsis>…</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}
+                <li><a href="{{ url_for('browse', page=pagination.next_num) }}">Next</a></li>
+            {% else %}
+                <li><span>Next</span></li>
+            {% endif %}
+      </ul>
+    </nav>
+
+    {% for question in questions %}
+        <div class="well well-md">
+            <h5>Toss Up | {{ question['category'] }} | {{ question['tossup_format'] }}</h5>
+            <p>{{ question['tossup_question']|safe }}</p>
+            <p><strong>ANSWER:</strong> {{ question['tossup_answer'] }}</p>
+            <hr/>
+            <h5>Bonus | {{ question['category'] }} | {{ question['bonus_format'] }}</h5>
+            <p>{{ question['bonus_question']|safe  }}</p>
+            <p><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
+            <a href="{{ question['uri'] }}"><small>PERMALINK</small></a>
+        </div>
+    {% endfor %}
+
+    <nav class="text-center">
+        <ul class="pagination">
+            {% if pagination.has_prev %}
+                <li><a href="{{ url_for('browse', page=pagination.prev_num) }}">Previous</a></li>
+            {% else %}
+                <li class="disabled"><span>Previous</span></li>
+            {% endif %}
+            {%for page in pagination.iter_pages() %}
+                {% if page %}
+                    {% if page != pagination.page %}
+                        <li><a href="{{ url_for('browse', page=page) }}">{{ page }}</a></li>
+                    {% else %}
+                        <li class="active"><span>{{ page }}</span></li>
+                    {% endif %}
+                {% else %}
+                    <li class="disabled"><span class=ellipsis>…</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}
+                <li><a href="{{ url_for('browse', page=pagination.next_num) }}">Next</a></li>
+            {% else %}
+                <li><span>Next</span></li>
+            {% endif %}
+      </ul>
+    </nav>
+{% endblock %}

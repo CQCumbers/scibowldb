@@ -1,10 +1,10 @@
-<form action="{{ url_for('settings') }}" method="post">
+<form action="{{ url_for('settings', next=request.endpoint) }}" method="post">
     <fieldset>
     <legend>Settings</legend>
     <div class="form-group">
         <label for="categoryselect">Categories</label>
         <select multiple id="categoryselect" name="category" class="selectpicker" data-actions-box="true">
-            <option value="PHSYICS" {% if "PHSYICS" in settings.categories %} selected="selected" {% endif %}>Physics</option>
+            <option value="PHYSICS" {% if "PHYSICS" in settings.categories %} selected="selected" {% endif %}>Physics</option>
             <option value="GENERAL SCIENCE" {% if "GENERAL SCIENCE" in settings.categories %} selected="selected" {% endif %}>General Science</option>
             <option value="ENERGY" {% if "ENERGY" in settings.categories %} selected="selected" {% endif %}>Energy</option>
             <option value="EARTH AND SPACE" {% if "EARTH AND SPACE" in settings.categories %} selected="selected" {% endif %}>Earth and Space</option>
@@ -19,7 +19,7 @@
     <div class="form-group">
         <label for="sourceselect">Sources</label>
         <select multiple id="sourceselect" name="source" class="selectpicker" data-actions-box="true">
-            <option value="official" {% if "official" in settings.sources %} selected="selected" {% endif %}>Official</option>
+            <option value="Official" {% if "Official" in settings.sources %} selected="selected" {% endif %}>Official</option>
             <option value="CSUB" {% if "CSUB" in settings.sources %} selected="selected" {% endif %}>CSUB</option>
             <option value="05Nats" {% if "05Nats" in settings.sources %} selected="selected" {% endif %}>'05 Nats</option>
             <option value="98Nats" {% if "98Nats" in settings.sources %} selected="selected" {% endif %}>'98 Nats</option>

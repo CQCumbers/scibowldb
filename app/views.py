@@ -1,5 +1,7 @@
 from flask import abort, jsonify, make_response, request, url_for, render_template, session, redirect, flash
 from app import app, db
+from config import QUESTIONS_PER_PAGE
+from sqlalchemy import or_
 import re
 from .models import Question
 import random
@@ -88,11 +90,30 @@ def bonus():
        question = random.choice(list(Question.query.all()))
     return render_template('bonus.html', question=make_public(question, html=True), settings=session)
 
+@app.route('/browse')
+@app.route('/browse/<int:page>')
+def browse(page=1):
+    # filter questions by category and source
+    if 'categories' in session and len(session['categories']) > 0:
+        questions = Question.query.filter(Question.category.in_(session['categories']))
+    else:
+        questions = Question.query;
+    if 'sources' in session and len(session['sources']) > 0:
+        questions = questions.filter(or_(*[Question.source.startswith(source) for source in session['sources']]))
+    # reset settings if they filter out all questions, for example if the source does not contain any questions of a particular category
+    questions = questions.paginate(page, QUESTIONS_PER_PAGE, False)
+    if len(questions.items) == 0:
+        flash("The inputted settings did not match any available questions")
+        questions=Question.query.paginate(page, QUESTIONS_PER_PAGE, False);
+        session['categories'] = []
+        session['sources'] = []
+    return render_template('browse.html', questions=[make_public(question) for question in questions.items], settings=session, pagination=questions)
+
 @app.route('/settings', methods=['POST'])
 def settings():
     session['categories'] = request.form.getlist('category')
     session['sources'] = request.form.getlist('source')
-    return redirect(url_for('tossup'))
+    return redirect(request.args.get('next') or url_for('tossup'))
 
 # set the secret key. keep this really secret (put somewhere more private in the future)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
