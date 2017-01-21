@@ -109,7 +109,7 @@ def browse(page=1):
         questions=Question.query.paginate(page, QUESTIONS_PER_PAGE, False);
         session['categories'] = []
         session['sources'] = []
-    return render_template('browse.html', questions=[make_public(question) for question in questions.items], settings=session, pagination=questions)
+    return render_template('browse.html', questions=[make_public(question, html=True) for question in questions.items], settings=session, pagination=questions)
 
 @app.route('/about')
 def about():
