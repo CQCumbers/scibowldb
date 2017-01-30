@@ -128,8 +128,7 @@ def report():
     return redirect(request.args.get('next') or url_for('tossup'))
 
 @app.route('/viewreports')
-@app.route('/viewreports/<int:page>')
-def viewreports(page=1):
+def viewreports():
     questions = Question.query.filter(Question.reported == True).all()
     return jsonify({'questions': [make_public(q) for q in questions]})
 
