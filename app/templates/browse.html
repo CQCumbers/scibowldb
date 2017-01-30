@@ -1,31 +1,19 @@
 {% extends "base.html" %}
 {% block title %}Browse{% endblock %}
 {% block content %}
-    <nav class="text-center">
-        <ul class="pagination">
-            {% if pagination.has_prev %}
-                <li><a href="{{ url_for('browse', page=pagination.prev_num) }}">Previous</a></li>
-            {% else %}
-                <li class="disabled"><span>Previous</span></li>
-            {% endif %}
-            {%for page in pagination.iter_pages() %}
-                {% if page %}
-                    {% if page != pagination.page %}
-                        <li><a href="{{ url_for('browse', page=page) }}">{{ page }}</a></li>
-                    {% else %}
-                        <li class="active"><span>{{ page }}</span></li>
-                    {% endif %}
-                {% else %}
-                    <li class="disabled"><span class=ellipsis>…</span></li>
-                {% endif %}
-            {% endfor %}
-            {% if pagination.has_next %}
-                <li><a href="{{ url_for('browse', page=pagination.next_num) }}">Next</a></li>
-            {% else %}
-                <li><span>Next</span></li>
-            {% endif %}
-      </ul>
-    </nav>
+
+    <form action="{{ url_for('search') }}" method="post">
+        <div class="form-group">
+            <label class="sr-only" for="searchfield">Search</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchfield" placeholder="Search" name="search">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">Go!</button>
+                </span>
+            </div>
+        </div>
+    </form>
+    <p>{{ (pagination.page-1)*pagination.per_page + 1 }} to {{ (pagination.page * pagination.per_page) if pagination.page * pagination.per_page < pagination.total else pagination.total }} of {{ pagination.total }} results</p>
 
     {% for question in questions %}
         <div class="well well-md">
@@ -36,7 +24,11 @@
             <h5>Bonus | {{ question['category'] }} | {{ question['bonus_format'] }}</h5>
             <p>{{ question['bonus_question']|safe  }}</p>
             <p><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
-            <a href="{{ question['uri'] }}"><small>PERMALINK</small></a>
+            <form action="{{ url_for('report', next=request.endpoint)  }}" method="post">
+                <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
+                <input type="hidden" name="uri" value="{{ question['uri'] }}">
+                <button type="submit" class="btn btn-link btn-xs"><small>REPORT</small></button>
+            </form>
         </div>
     {% endfor %}
 
@@ -61,7 +53,7 @@
             {% if pagination.has_next %}
                 <li><a href="{{ url_for('browse', page=pagination.next_num) }}">Next</a></li>
             {% else %}
-                <li><span>Next</span></li>
+                <li class="disabled"><span>Next</span></li>
             {% endif %}
       </ul>
     </nav>

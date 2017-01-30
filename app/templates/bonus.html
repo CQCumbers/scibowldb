@@ -6,7 +6,11 @@
     <p class="lead">{{ question['bonus_question']|safe  }}</p>
     <hr/>
     <p class="lead"><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
-    <a href="{{ question['uri'] }}"><small>PERMALINK</small></a>
+    <form action="{{ url_for('report', next=request.endpoint)  }}" method="post">
+        <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
+        <input type="hidden" name="uri" value="{{ question['uri'] }}">
+        <button type="submit" class="btn btn-link btn-xs"><small>REPORT</small></button>
+    </form>
 </div>
 <a class="btn btn-primary btn-lg btn-block" href="{{ url_for('tossup') }}">Toss Up</a>
 {% endblock %}
