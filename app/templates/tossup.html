@@ -4,13 +4,32 @@
 <div class="well well-lg">
     <h3>Toss Up | {{ question['category'] }} | {{ question['tossup_format'] }}</h3>
     <p class="lead">{{ question['tossup_question']|safe }}</p>
-    <hr/>
-    <p class="lead">ANSWER: {{ question['tossup_answer'] }}</p>
-    <form action="{{ url_for('report', next=request.endpoint)  }}" method="post">
-        <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
-        <input type="hidden" name="uri" value="{{ question['uri'] }}">
-        <button type="submit" class="btn btn-link btn-xs"><small>REPORT</small></button>
-    </form>
+    <div class="collapse" id="answerbox">
+        <p class="lead"><strong>ANSWER:</strong> {{ question['tossup_answer'] }}</p>
+        <form action="{{ url_for('report', next=request.endpoint)  }}" method="post">
+            <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
+            <input type="hidden" name="uri" value="{{ question['uri'] }}">
+            <button type="submit" class="btn btn-link btn-xs"><small>REPORT</small></button>
+        </form>
+    </div>
 </div>
-<a class="btn btn-primary btn-lg btn-block" href="{{ url_for('bonus') }}">Bonus</a>
+
+<div class="collapse in" id="showbuttonbox">
+    <button class="btn btn-primary btn-lg btn-block" id="showbutton" type="button" data-toggle="collapse" data-target="#answerbox,#showbuttonbox,#nextbuttonbox">Answer</button>
+</div>
+<div class="collapse" id="nextbuttonbox">
+    <a class="btn btn-primary btn-lg btn-block" id="nextbutton" href="{{ url_for('bonus') }}">Bonus</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+Mousetrap.bind(['down', 'right', 'n', 'space', 'enter'], function() {
+    if ($('#nextbuttonbox').is(':hidden')) {
+        $('#showbutton').click();
+    } else {
+        $('#nextbutton')[0].click();
+    }
+});
+</script>
 {% endblock %}

@@ -57,7 +57,7 @@ def tossup():
     questions = filter().all()
     # reset settings if they filter out all questions, for example if the source does not contain any questions of a particular category
     if len(questions) <= 0:
-        flash("The inputted settings did not match any available questions")
+        flash("The inputted settings did not match any available questions. Please try again.")
         questions=Question.query.all()
         session['categories'] = []
         session['sources'] =[]
@@ -72,7 +72,7 @@ def bonus():
     else:
         questions = filter().all()
         if len(questions) <= 0:
-            flash("The inputted settings did not match any available questions")
+            flash("The inputted settings did not match any available questions. Please try again.")
             questions=Question.query.all()
             session['categories'] = []
             session['sources'] = []
@@ -87,7 +87,7 @@ def browse(page=1):
         questions = questions.whoosh_search(session['search'])
     questions = questions.paginate(page, QUESTIONS_PER_PAGE, False)
     if len(questions.items) <= 0:
-        flash("The inputted settings did not match any available questions")
+        flash("The inputted settings did not match any available questions. Please try again.")
         questions=Question.query.paginate(page, QUESTIONS_PER_PAGE, False)
         session['categories'] = []
         session['sources'] = []

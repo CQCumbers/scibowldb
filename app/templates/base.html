@@ -1,83 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>SciBowlDB | {% block title %}{% endblock %}</title>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title>SciBowlDB | {% block title %}{% endblock %}</title>
+        <!-- Completely overkill favicon related stuff -->
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-touch-icon.png">
+        <link rel="icon" type="image/png" href="/static/img/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="/static/img/favicon-16x16.png" sizes="16x16">
+        <link rel="manifest" href="/static/img/manifest.json">
+        <link rel="mask-icon" href="/static/img/safari-pinned-tab.svg" color="#5bbad5">
+        <link rel="shortcut icon" href="/static/img/favicon.ico">
+        <meta name="apple-mobile-web-app-title" content="ScibowlDB">
+        <meta name="application-name" content="ScibowlDB">
+        <meta name="msapplication-config" content="/static/img/browserconfig.xml">
+        <meta name="theme-color" content="#ffffff">
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Bootstrap-select -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.min.css">
-    <!-- Bootswatch-readable -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/readable/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <!-- Bootstrap-select -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.min.css">
+        <!-- Bootswatch-readable -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/readable/bootstrap.min.css" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
 
-    <!-- MathJax -->
-    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>
-  </head>
-  <body>
-    <nav class="navbar navbar-default">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#"><strong>SciBowl</strong>DB</a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li {% if self.title() in ['Tossup', 'Bonus'] %} class="active" {% endif %}><a href="{{ url_for('tossup') }}"> Play {% if self.title() in ['tossup', 'bonus'] %}<span class="sr-only">(current)</span>{% endif %}</a></li>
-            <li {% if self.title() == 'Browse' %} class="active" {% endif %}><a href="{{ url_for('browse') }}"> Browse {% if self.title() == 'browse' %}<span class="sr-only">(current)</span>{% endif %}</a></li>
-            <li {% if self.title() == 'About' %} class="active" {% endif %}><a href="{{ url_for('about') }}"> About {% if self.title() == 'about' %}<span class="sr-only">(current)</span>{% endif %}</a></li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
-    </nav>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-9">
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-danger" role="alert">
-                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                    <span class="sr-only">Error:</span> 
-                    {{ message }}
+        <!-- MathJax -->
+        <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <span><img src="/static/img/logo.png"></span>
+                        <strong>SciBowl</strong>DB
+                    </a>
                 </div>
-                {% endfor %}
-            {% endif %}
-            {% endwith %}
-            {% block content %}
-            {% endblock %}
-            </div>
 
-            <div class="col-md-3">
-                {% include "settings.html" %}
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li {% if self.title() in ['Tossup', 'Bonus'] %} class="active" {% endif %}><a href="{{ url_for('tossup') }}"> Play {% if self.title() in ['tossup', 'bonus'] %}<span class="sr-only">(current)</span>{% endif %}</a></li>
+                        <li {% if self.title() == 'Browse' %} class="active" {% endif %}><a href="{{ url_for('browse') }}"> Browse {% if self.title() == 'browse' %}<span class="sr-only">(current)</span>{% endif %}</a></li>
+                        <li {% if self.title() == 'About' %} class="active" {% endif %}><a href="{{ url_for('about') }}"> About {% if self.title() == 'about' %}<span class="sr-only">(current)</span>{% endif %}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-9 form-group">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-warning alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+                {% block content %}
+                {% endblock %}
+                </div>
+
+                <div class="col-sm-3 form-group">
+                    {% include "settings.html" %}
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <!-- Bootstrap-select Javascript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.min.js"></script>
-  </body>
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <!-- Bootstrap -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <!-- Bootstrap-select Javascript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.min.js"></script>
+        <!-- Mousetrap Javascript -->
+        <script src="/static/js/mousetrap.min.js"></script>
+        {% block scripts %}{% endblock %}
+    </body>
 </html>
