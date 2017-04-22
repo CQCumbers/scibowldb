@@ -24,7 +24,8 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.min.css">
         <!-- Bootswatch-readable -->
         <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/readable/bootstrap.min.css" rel="stylesheet">
-
+        <!-- Ladda CSS -->
+        <link rel="stylesheet" href="static/ladda-themeless.min.css">
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -78,10 +79,35 @@
                     {% endfor %}
                 {% endif %}
                 {% endwith %}
+
+                <div class="modal fade" id="report_modal" tabindex="-1" role="dialog" aria-labelledby="report_modal_label" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form id="report-form" action="{{ url_for('report', next=request.endpoint)  }}" method="post">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title" id="report_modal_label">Report Question</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" name="id">
+                                    <label for="report-text" class="form-control-label">What needs to be fixed?</label>
+                                    <textarea name = "message" class="form-control" id="report-text" rows="5" placeholder="The category is incorrect"></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary ladda-button" data-style="expand-right"><span class="ladda-label">Send Report</span><span class="ladda-spinner"></span></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 {% block content %}
                 {% endblock %}
                 </div>
-
+                <br/>
                 <div class="col-sm-3 form-group">
                     {% include "settings.html" %}
                 </div>
@@ -96,6 +122,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.min.js"></script>
         <!-- Mousetrap Javascript -->
         <script src="/static/js/mousetrap.min.js"></script>
+
         {% block scripts %}{% endblock %}
+
+         <!-- Ladda JS -->
+        <script src="static/spin.min.js"></script>
+        <script src="static/ladda.min.js"></script>
+        <script>Ladda.bind('.ladda-button');</script>
     </body>
 </html>

@@ -2,15 +2,12 @@
 {% block title %}Bonus{% endblock %}
 {% block content %}
 <div class="well well-lg">
-    <h3>Bonus | {{ question['category'] }} | {{ question['bonus_format'] }}</h3>
+    <h4>Bonus | {{ question['category'] }} | {{ question['bonus_format'] }}</h4>
     <p class="lead">{{ question['bonus_question']|safe  }}</p>
     <div class="collapse" id="answerbox">
         <p class="lead"><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
-        <form action="{{ url_for('report', next=request.endpoint)  }}" method="post">
-            <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
-            <input type="hidden" name="uri" value="{{ question['uri'] }}">
-            <button type="submit" class="btn btn-link btn-xs"><small>REPORT</small></button>
-        </form>
+        <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
+        <button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}"><small>REPORT</small></button>
     </div>
 </div>
 
@@ -31,5 +28,15 @@ Mousetrap.bind(['down', 'right', 'n', 'space', 'enter'], function() {
         $('#nextbutton')[0].click();
     }
 });
+</script>
+<script>
+$('#report_modal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var question_id = button.data('id') // Extract info from data-* attributes
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('.modal-title').text('Report Question ' + question_id)
+    modal.find('.modal-body input').attr('value', question_id)
+})
 </script>
 {% endblock %}

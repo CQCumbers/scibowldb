@@ -4,6 +4,7 @@ from config import QUESTIONS_PER_PAGE
 from sqlalchemy import or_
 import re, random
 from .models import Question
+from .emails import question_report
 
 @app.route('/api/v1.0/questions/', methods=['GET'])
 def get_questions():
@@ -40,8 +41,7 @@ def make_public(question, html=False):
     for field in question.as_dict():
         if field == 'id':
             new_question['uri'] = url_for('get_question', question_id=question.id, _external=True)
-        else:
-            new_question[field] = question.as_dict()[field]
+        new_question[field] = question.as_dict()[field]
         if html:
             new_question['tossup_question'] = re.sub(r'\n\(?(?P<letter>[WXYZ])', r'<br>\g<letter>', question.tossup_question)
             new_question['bonus_question'] = re.sub(r'\n\(?(?P<letter>[WXYZ])', r'<br>\g<letter>', question.bonus_question)
@@ -120,14 +120,6 @@ def filter(params=session):
 
 @app.route('/report', methods=['POST'])
 def report():
-    question = Question.query.get(request.form.get('uri')[len(url_for('get_questions', _external=True)):])
-    print(request.form.get('uri')[len(url_for('get_questions', _external=True)):])
-    question.reported = True
-    db.session.commit()
+    question_report(request.form.get('id'), request.form.get('message'))
     flash("Thank you for reporting a question in need of improvement!")
     return redirect(request.args.get('next') or url_for('tossup'))
-
-@app.route('/viewreports')
-def viewreports():
-    questions = Question.query.filter(Question.reported == True).all()
-    return jsonify({'questions': [make_public(q) for q in questions]})
