@@ -131,6 +131,3 @@ def report():
 def viewreports():
     questions = Question.query.filter(Question.reported == True).all()
     return jsonify({'questions': [make_public(q) for q in questions]})
-
-# set the secret key. keep this really secret (put somewhere more private in the future)
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
