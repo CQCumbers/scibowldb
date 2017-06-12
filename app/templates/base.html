@@ -90,6 +90,7 @@
       <div class="container">
         {% if current_user.is_authenticated %}
         <form id="logout-form" action="{{ url_for('logout', next=request.endpoint)  }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button type="submit" class="btn btn-link navbar-btn pull-left">Logout</button>
         </form>
         {% else %}
