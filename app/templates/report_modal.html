@@ -1,0 +1,24 @@
+<div class="modal fade" id="report_modal" tabindex="-1" role="dialog" aria-labelledby="report_modal_label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="report-form" action="{{ url_for('report', next=request.endpoint)  }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="report_modal_label">Report Question</h4>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id">
+          <label for="report-text" class="form-control-label">What needs to be fixed?</label>
+          <textarea name = "message" class="form-control" id="report-text" rows="5" placeholder="The category is incorrect"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary ladda-button" data-style="expand-right"><span class="ladda-label">Send Report</span><span class="ladda-spinner"></span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,25 +1,44 @@
 from flask import abort, jsonify, make_response, request, url_for, render_template, session, redirect, flash
+from urllib.parse import urlparse, urljoin
+from flask_login import current_user, login_user, logout_user, login_required
+import flask_whooshalchemyplus
 from app import app, db
-from config import QUESTIONS_PER_PAGE
+from config import QUESTIONS_PER_PAGE, LOGIN_USERNAME, LOGIN_PASSWORD
 from sqlalchemy import or_
 import re, random
-from .models import Question
+from .models import Question, User
 from .emails import question_report
+
+with app.app_context():
+    #flask_whooshalchemyplus.index_all(app)
+    ALL_SOURCES = sorted(set([question.source.split('-')[0] for question in Question.query.distinct(Question.source)]))
+    ALL_CATEGORIES = sorted(set([question.category for question in Question.query.distinct(Question.category)]))
+    FREE_SOURCES = sorted(set(['Official', '98Nats', '05Nats', 'CSUB']))
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and \
+           ref_url.netloc == test_url.netloc
 
 @app.route('/api/v1.0/questions/', methods=['GET'])
 def get_questions():
-    questions = Question.query.all()
+    questions = Question.query.filter(or_(*[Question.source.startswith(source) for source in FREE_SOURCES]))
     return jsonify({'questions': [make_public(q) for q in questions]})
 
 @app.route('/api/v1.0/questions/random', methods=['GET'])
 def get_random_question():
-    question = random.choice(Question.query.all())
+    questions = Question.query.filter(or_(*[Question.source.startswith(source) for source in FREE_SOURCES]))
+    question = random.choice(questions)
     return jsonify({'question': make_public(question)})
 
 @app.route('/api/v1.0/questions/<int:question_id>', methods=['GET'])
 def get_question(question_id):
     question = Question.query.get_or_404(question_id)
-    return jsonify({'question': make_public(question)})
+    if question in Question.query.filter(or_(*[Question.source.startswith(source) for source in FREE_SOURCES])):
+        return jsonify({'question': make_public(question)})
+    else:
+        abort(404)
 
 # Filter for questions with certain attributes using post requests
 @app.route('/api/v1.0/questions/', methods=['POST'])
@@ -63,7 +82,8 @@ def tossup():
         session['sources'] =[]
     question = random.choice(questions)
     session['question_id'] = question.id
-    return render_template('tossup.html', question=make_public(question, html=True), settings=session)
+    sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
+    return render_template('tossup.html', question=make_public(question, html=True), settings=session, sources=sources, categories=ALL_CATEGORIES)
 
 @app.route('/bonus')
 def bonus():
@@ -77,7 +97,8 @@ def bonus():
             session['categories'] = []
             session['sources'] = []
         question = random.choice(questions)
-    return render_template('bonus.html', question=make_public(question, html=True), settings=session)
+    sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
+    return render_template('bonus.html', question=make_public(question, html=True), settings=session, sources=sources, categories=ALL_CATEGORIES)
 
 @app.route('/browse')
 @app.route('/browse/<int:page>')
@@ -92,17 +113,24 @@ def browse(page=1):
         session['categories'] = []
         session['sources'] = []
         session['search'] = ''
-    return render_template('browse.html', questions=[make_public(question, html=True) for question in questions.items], settings=session, pagination=questions)
+    sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
+    return render_template('browse.html', questions=[make_public(question, html=True) for question in questions.items], pagination=questions, settings=session, sources=sources, categories=ALL_CATEGORIES)
 
 @app.route('/about')
 def about():
-    return render_template('about.html', settings=session, num_questions=len(Question.query.all())*2) # counting both tossup and bonuses
+    sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
+    return render_template('about.html', settings=session, num_questions=len(Question.query.all())*2, sources=sources, categories=ALL_CATEGORIES) # counting both tossup and bonuses
 
 @app.route('/settings', methods=['POST'])
 def settings():
     session['categories'] = request.form.getlist('category')
     session['sources'] = request.form.getlist('source')
-    return redirect(request.args.get('next') or url_for('tossup'))
+
+    next = request.args.get('next')
+    if not is_safe_url(next):
+        return flask.abort(400)
+    else:
+        return redirect(next or url_for('tossup'))
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -112,6 +140,8 @@ def search():
 def filter(params=session):
     # filter questions by category and source
     questions = Question.query
+    if not current_user.is_authenticated:
+        questions = questions.filter(or_(*[Question.source.startswith(source) for source in FREE_SOURCES]))
     if 'categories' in params and params['categories'] is not None and len(params['categories']) > 0:
         questions = questions.filter(Question.category.in_(params['categories']))
     if 'sources' in params and params['sources'] is not None and len(params['sources']) > 0:
@@ -122,4 +152,35 @@ def filter(params=session):
 def report():
     question_report(request.form.get('id'), request.form.get('message'))
     flash("Thank you for reporting a question in need of improvement!")
-    return redirect(request.args.get('next') or url_for('tossup'))
+    
+    next = request.args.get('next')
+    if not is_safe_url(next):
+        return flask.abort(400)
+    else:
+        return redirect(next or url_for('tossup'))
+
+@app.route('/login', methods=['POST'])
+def login():
+    user = User() if request.form.get('username') == LOGIN_USERNAME and request.form.get('password') == LOGIN_PASSWORD else None
+    if user is not None:
+        login_user(user)
+        flash("Login successful!")
+    else:
+        flash("Invalid username and/or password")
+
+    next = request.args.get('next')
+    if not is_safe_url(next):
+        return flask.abort(400)
+    else:
+        return redirect(next or url_for('tossup'))
+
+@app.route('/logout', methods=['POST'])
+@login_required
+def logout():
+    logout_user()
+    flash("You logged out")
+    next = request.args.get('next')
+    if not is_safe_url(next):
+        return flask.abort(400)
+    else:
+        return redirect(next or url_for('tossup'))

@@ -6,10 +6,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+
+SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlcipher://:' + DB_PASSWORD + '@//' + os.path.join(basedir, 'encrypted.db')
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = True
-WHOOSH_BASE = os.path.join(basedir, 'search.db')
 
 # pagination
 QUESTIONS_PER_PAGE = 25;
@@ -22,3 +23,7 @@ MAIL_USE_SSL = True
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 ADMINS = [os.environ.get('MAIL_USERNAME')]
+
+# login stuff
+LOGIN_USERNAME = os.environ.get('LOGIN_USERNAME')
+LOGIN_PASSWORD = os.environ.get('LOGIN_PASSWORD')

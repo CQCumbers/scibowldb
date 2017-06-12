@@ -1,28 +1,21 @@
 <form action="{{ url_for('settings', next=request.endpoint) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <fieldset>
     <legend>Settings</legend>
     <div class="form-group">
         <label for="categoryselect">Categories</label>
         <select multiple id="categoryselect" name="category" class="selectpicker" data-actions-box="true">
-            <option value="PHYSICS" {% if "PHYSICS" in settings.categories %} selected="selected" {% endif %}>Physics</option>
-            <option value="GENERAL SCIENCE" {% if "GENERAL SCIENCE" in settings.categories %} selected="selected" {% endif %}>General Science</option>
-            <option value="ENERGY" {% if "ENERGY" in settings.categories %} selected="selected" {% endif %}>Energy</option>
-            <option value="EARTH AND SPACE" {% if "EARTH AND SPACE" in settings.categories %} selected="selected" {% endif %}>Earth and Space</option>
-            <option value="EARTH SCIENCE" {% if "EARTH SCIENCE" in settings.categories %} selected="selected" {% endif %}>Earth Science</option>
-            <option value="CHEMISTRY" {% if "CHEMISTRY" in settings.categories %} selected="selected" {% endif %}>Chemistry</option>
-            <option value="BIOLOGY" {% if "BIOLOGY" in settings.categories %} selected="selected" {% endif %}>Biology</option>
-            <option value="ASTRONOMY" {% if "ASTRONOMY" in settings.categories %} selected="selected" {% endif %}>Astronomy</option>
-            <option value="MATH" {% if "MATH" in settings.categories %} selected="selected" {% endif %}>Math</option>
-            <option value="COMPUTER SCIENCE" {% if "COMPUTER SCIENCE" in settings.categories %} selected="selected" {% endif %}>Computer Science</option>
+            {% for category in categories %}
+            <option value="{{ category }}" {% if category in settings.categories %} selected="selected" {% endif %}>{{ category.title() }}</option>
+            {% endfor %}
         </select>
     </div>
     <div class="form-group">
         <label for="sourceselect">Sources</label>
         <select multiple id="sourceselect" name="source" class="selectpicker" data-actions-box="true">
-            <option value="Official" {% if "Official" in settings.sources %} selected="selected" {% endif %}>Official</option>
-            <option value="CSUB" {% if "CSUB" in settings.sources %} selected="selected" {% endif %}>CSUB</option>
-            <option value="05Nats" {% if "05Nats" in settings.sources %} selected="selected" {% endif %}>'05 Nats</option>
-            <option value="98Nats" {% if "98Nats" in settings.sources %} selected="selected" {% endif %}>'98 Nats</option>
+            {% for source in sources %}
+            <option value="{{ source }}" {% if source in settings.sources %} selected="selected" {% endif %}>{{ source }}</option>
+            {% endfor %}
         </select>
         </div>
     <button type="submit" class="btn btn-default">Submit</button>
