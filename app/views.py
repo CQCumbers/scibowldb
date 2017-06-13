@@ -2,7 +2,7 @@ from flask import abort, jsonify, make_response, request, url_for, render_templa
 from urllib.parse import urlparse, urljoin
 from flask_login import current_user, login_user, logout_user, login_required
 import flask_whooshalchemyplus
-from app import app, db
+from app import app, db, limiter
 from config import QUESTIONS_PER_PAGE, LOGIN_USERNAME, LOGIN_PASSWORD
 from sqlalchemy import or_
 import re, random
@@ -149,6 +149,7 @@ def filter(params=session):
     return questions
 
 @app.route('/report', methods=['POST'])
+@limiter.limit("25/day;3/minute")
 def report():
     question_report(request.form.get('id'), request.form.get('message'))
     flash("Thank you for reporting a question in need of improvement!")
@@ -160,6 +161,7 @@ def report():
         return redirect(next or url_for('tossup'))
 
 @app.route('/login', methods=['POST'])
+@limiter.limit("10/day;3/minute")
 def login():
     user = User() if request.form.get('username') == LOGIN_USERNAME and request.form.get('password') == LOGIN_PASSWORD else None
     if user is not None:
