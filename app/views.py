@@ -13,7 +13,7 @@ with app.app_context():
     #flask_whooshalchemyplus.index_all(app)
     ALL_SOURCES = sorted(set([question.source.split('-')[0] for question in Question.query.distinct(Question.source)]))
     ALL_CATEGORIES = sorted(set([question.category for question in Question.query.distinct(Question.category)]))
-    FREE_SOURCES = sorted(set(['Official', '98Nats', '05Nats', 'CSUB']))
+    FREE_SOURCES = sorted(set(['Official']))#, '98Nats', '05Nats', 'CSUB']))
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
@@ -23,19 +23,19 @@ def is_safe_url(target):
 
 @app.route('/api/v1.0/questions/', methods=['GET'])
 def get_questions():
-    questions = Question.query.filter(or_(*[Question.source.startswith(source) for source in FREE_SOURCES]))
+    questions = filter(params=[],attemptAuth=False)
     return jsonify({'questions': [make_public(q) for q in questions]})
 
 @app.route('/api/v1.0/questions/random', methods=['GET'])
 def get_random_question():
-    questions = Question.query.filter(or_(*[Question.source.startswith(source) for source in FREE_SOURCES]))
+    questions = filter(params=[],attemptAuth=False)
     question = random.choice(questions)
     return jsonify({'question': make_public(question)})
 
 @app.route('/api/v1.0/questions/<int:question_id>', methods=['GET'])
 def get_question(question_id):
     question = Question.query.get_or_404(question_id)
-    if question in Question.query.filter(or_(*[Question.source.startswith(source) for source in FREE_SOURCES])):
+    if question in filter(params=[],attemptAuth=False):
         return jsonify({'question': make_public(question)})
     else:
         abort(404)
@@ -45,14 +45,14 @@ def get_question(question_id):
 def get_questions_filtered():
     if not request.json:
         abort(400)
-    questions = filter(request.json).all()
+    questions = filter(params=request.json).all()
     return jsonify({'questions': [make_public(q) for q in questions]})
 
 @app.route('/api/v1.0/questions/random', methods=['POST'])
 def get_random_question_filtered():
     if not request.json:
         abort(400)
-    question = random.choice(filter(request.json).all())
+    question = random.choice(filter(params=request.json).all())
     return jsonify({'question': make_public(question)})
 
 def make_public(question, html=False):
@@ -77,13 +77,13 @@ def tossup():
     # reset settings if they filter out all questions, for example if the source does not contain any questions of a particular category
     if len(questions) <= 0:
         flash("The inputted settings did not match any available questions. Please try again.")
-        questions=Question.query.all()
+        questions = filter(params=[])
         session['categories'] = []
         session['sources'] =[]
     question = random.choice(questions)
     session['question_id'] = question.id
-    sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
-    return render_template('tossup.html', question=make_public(question, html=True), settings=session, sources=sources, categories=ALL_CATEGORIES)
+    allowed_sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
+    return render_template('tossup.html', question=make_public(question, html=True), settings=session, sources=allowed_sources, categories=ALL_CATEGORIES)
 
 @app.route('/bonus')
 def bonus():
@@ -93,12 +93,12 @@ def bonus():
         questions = filter().all()
         if len(questions) <= 0:
             flash("The inputted settings did not match any available questions. Please try again.")
-            questions=Question.query.all()
+            questions = filter(params=[])
             session['categories'] = []
             session['sources'] = []
         question = random.choice(questions)
-    sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
-    return render_template('bonus.html', question=make_public(question, html=True), settings=session, sources=sources, categories=ALL_CATEGORIES)
+    allowed_sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
+    return render_template('bonus.html', question=make_public(question, html=True), settings=session, sources=allowed_sources, categories=ALL_CATEGORIES)
 
 @app.route('/browse')
 @app.route('/browse/<int:page>')
@@ -109,7 +109,7 @@ def browse(page=1):
     questions = questions.paginate(page, QUESTIONS_PER_PAGE, False)
     if len(questions.items) <= 0:
         flash("The inputted settings did not match any available questions. Please try again.")
-        questions=Question.query.paginate(page, QUESTIONS_PER_PAGE, False)
+        questions=filter(params=[]).paginate(page, QUESTIONS_PER_PAGE, False)
         session['categories'] = []
         session['sources'] = []
         session['search'] = ''
@@ -119,7 +119,7 @@ def browse(page=1):
 @app.route('/about')
 def about():
     sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
-    return render_template('about.html', settings=session, num_questions=len(Question.query.all())*2, sources=sources, categories=ALL_CATEGORIES) # counting both tossup and bonuses
+    return render_template('about.html', settings=session, num_questions=len(list(filter(params=[])))*2, sources=sources, categories=ALL_CATEGORIES) # counting both tossup and bonuses
 
 @app.route('/settings', methods=['POST'])
 def settings():
@@ -137,10 +137,10 @@ def search():
     session['search'] = request.form.get('search')
     return redirect(url_for('browse'))
 
-def filter(params=session):
+def filter(params=session, attemptAuth=True):#params=session):
     # filter questions by category and source
     questions = Question.query
-    if not current_user.is_authenticated:
+    if not attemptAuth or not current_user.is_authenticated:
         questions = questions.filter(or_(*[Question.source.startswith(source) for source in FREE_SOURCES]))
     if 'categories' in params and params['categories'] is not None and len(params['categories']) > 0:
         questions = questions.filter(Question.category.in_(params['categories']))
