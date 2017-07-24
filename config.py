@@ -13,7 +13,7 @@ SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 # pagination
-QUESTIONS_PER_PAGE = 25;
+QUESTIONS_PER_PAGE = 10;
 
 # email server
 MAIL_SERVER = 'smtp.gmail.com'

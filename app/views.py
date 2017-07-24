@@ -62,7 +62,8 @@ def make_public(question, html=False):
         if field == 'id':
             new_question['api_url'] = url_for('get_question', question_id=question.id, _external=True)
             new_question['uri'] = url_for('tossup', question_id=question.id, _external=True)
-        new_question[field] = question.as_dict()[field]
+        if field != 'rand_id':
+            new_question[field] = question.as_dict()[field]
         if html:
             new_question['tossup_question'] = re.sub(r'\n\(?(?P<letter>[WXYZ])', r'<br>\g<letter>', question.tossup_question)
             new_question['bonus_question'] = re.sub(r'\n\(?(?P<letter>[WXYZ])', r'<br>\g<letter>', question.bonus_question)
