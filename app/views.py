@@ -5,8 +5,8 @@ import flask_whooshalchemyplus
 from app import app, db, limiter
 from config import QUESTIONS_PER_PAGE, LOGIN_USERNAME, LOGIN_PASSWORD
 from sqlalchemy import or_
-from sqlalchemy.sql.expression import case
-import re, random
+from sqlalchemy.sql.expression import func
+import re, random, ast
 from .models import Question, User
 from .emails import question_report
 
@@ -126,6 +126,22 @@ def browse(page=1):
         session['search'] = ''
     sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
     return render_template('browse.html', questions=[make_public(question, html=True) for question in questions.items], pagination=questions, settings=session, sources=sources, categories=ALL_CATEGORIES)
+
+@app.route('/round')
+@app.route('/round/<lst>')
+def round(lst=[]):
+    if len(lst) >= 1:
+        lst = ast.literal_eval(lst) 
+        questions = [Question.query.get(i) for i in lst if i > 0 and Question.query.get(i) in filter(params=[])]
+    else:
+        questions = filter().order_by(func.random()).limit(25).all()
+    if len(questions) <= 0:
+        flash("The inputted settings did not match any available questions. Please try again.")
+        questions=filter(params=[]).order_by(func.random()).limit(25).all()
+        session['categories'] = []
+        session['sources'] = []
+    sources = ALL_SOURCES if current_user.is_authenticated else FREE_SOURCES
+    return render_template('round.html', questions=[make_public(question, html=True) for question in questions], ids=[question.id for question in questions], settings=session, sources=sources, categories=ALL_CATEGORIES)
 
 @app.route('/about')
 def about():

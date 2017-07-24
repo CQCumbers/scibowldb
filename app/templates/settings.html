@@ -1,4 +1,4 @@
-<form action="{{ url_for('settings', next=request.endpoint) }}" method="post">
+<form class="hidden-print" action="{{ url_for('settings', next=request.endpoint) }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <fieldset>
     <legend>Settings</legend>

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Round{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-xs-5">
+            <p><h4>Random Round</h4></p>
+        </div>
+        <div class="col-xs-7 hidden-print">
+            <p class="text-right">
+                 <a class="btn btn-link btn-xs" href="javascript:window.print()">Print Round</a>
+                 <a class="btn btn-link btn-xs" href="{{ url_for('round', lst=ids) }}">Permalink</a>
+            </p>
+        </div>
+    </div>
+
+    {% for question in questions %}
+        <a class="question-anchor"></a>
+        <div style="page-break-inside: avoid;" class="well well-md">
+            <h5>{{ loop.index }}) Toss Up - {{ question['category'].title() }} - {{ question['tossup_format'] }}</h5>
+            <p>{{ question['tossup_question']|safe }}</p>
+            <p><strong>ANSWER:</strong> {{ question['tossup_answer'] }}</p>
+            <hr/>
+            <h5>{{ loop.index }}) Bonus - {{ question['category'].title() }} - {{ question['bonus_format'] }}</h5>
+            <p>{{ question['bonus_question']|safe  }}</p>
+            <p><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
+            <button type="button" class="btn btn-link btn-xs hidden-print"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
+            <button type="button" class="btn btn-link btn-xs hidden-print" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}"><small>REPORT</small></button>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+var index = -1;
+Mousetrap.bind(['down', 'right', 'n', 'space', 'enter'], function(e) {
+    e.preventDefault();
+    index++;
+    $("html, body").animate({ scrollTop : $('.question-anchor').eq(index).position().top })
+});
+Mousetrap.bind(['up', 'left', 'p'], function(e) {
+    e.preventDefault();
+    index--;
+    if(index < 0) { index = 0;}
+    $("html, body").animate({ scrollTop : $('.question-anchor').eq(index).position().top })
+});
+</script>
+<script>
+$('#report_modal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var question_id = button.data('id') // Extract info from data-* attributes
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('.modal-title').text('Report Question ' + question_id)
+    modal.find('.modal-body input').attr('value', question_id)
+})
+</script>
+{% endblock %}
+
