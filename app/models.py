@@ -2,6 +2,7 @@ from app import db, app
 from sqlalchemy.sql import expression
 from flask_login import UserMixin
 import flask_whooshalchemyplus
+import random
 
 class Question(db.Model):
     #__tablename__ = 'question'
@@ -16,6 +17,7 @@ class Question(db.Model):
     bonus_format = db.Column(db.Text, index=True)
     bonus_question = db.Column(db.Text)
     bonus_answer = db.Column(db.Text)
+    rand_id = db.Column(db.Integer)
 
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

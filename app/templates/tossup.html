@@ -2,7 +2,7 @@
 {% block title %}Tossup{% endblock %}
 {% block content %}
 <div class="well well-lg">
-    <h4>Toss Up | {{ question['category'] }} | {{ question['tossup_format'] }}</h4>
+    <h4>Toss Up - {{ question['category'].title() }} - {{ question['tossup_format'] }}</h4>
     <p class="lead">{{ question['tossup_question']|safe }}</p>
     <div class="collapse" id="answerbox">
         <p class="lead"><strong>ANSWER:</strong> {{ question['tossup_answer'] }}</p>

@@ -7,7 +7,7 @@
         <div class="form-group">
             <label class="sr-only" for="searchfield">Search</label>
             <div class="input-group">
-                <input type="text" class="form-control" id="searchfield" placeholder="Search" name="search">
+                <input type="text" class="form-control" id="searchfield" placeholder="Search" {% if settings.search %} value="{{ settings.search }}" {% endif %} name="search">
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="submit">Go!</button>
                 </span>
@@ -31,11 +31,11 @@
     {% for question in questions %}
         <a class="question-anchor"></a>
         <div class="well well-md">
-            <h5>Toss Up | {{ question['category'] }} | {{ question['tossup_format'] }}</h5>
+            <h5>{{ loop.index }}) Toss Up - {{ question['category'].title() }} - {{ question['tossup_format'] }}</h5>
             <p>{{ question['tossup_question']|safe }}</p>
             <p><strong>ANSWER:</strong> {{ question['tossup_answer'] }}</p>
             <hr/>
-            <h5>Bonus | {{ question['category'] }} | {{ question['bonus_format'] }}</h5>
+            <h5>{{ loop.index }}) Bonus - {{ question['category'].title() }} - {{ question['bonus_format'] }}</h5>
             <p>{{ question['bonus_question']|safe  }}</p>
             <p><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
             <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>

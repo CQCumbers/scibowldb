@@ -2,7 +2,7 @@
 {% block title %}Bonus{% endblock %}
 {% block content %}
 <div class="well well-lg">
-    <h4>Bonus | {{ question['category'] }} | {{ question['bonus_format'] }}</h4>
+    <h4>Bonus - {{ question['category'].title() }} - {{ question['bonus_format'] }}</h4>
     <p class="lead">{{ question['bonus_question']|safe  }}</p>
     <div class="collapse" id="answerbox">
         <p class="lead"><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
@@ -12,7 +12,7 @@
 </div>
 
 <div class="collapse in" id="showbuttonbox">
-    <button class="btn btn-primary btn-lg btn-block" id="showbutton" type="button" data-toggle="collapse" data-target="#answerbox,#showbuttonbox,#nextbuttonbox">Show Answer</button>
+    <button class="btn btn-primary btn-lg btn-block" id="showbutton" type="button" data-toggle="collapse" data-target="#answerbox,#showbuttonbox,#nextbuttonbox">Answer</button>
 </div>
 <div class="collapse" id="nextbuttonbox">
     <a class="btn btn-primary btn-lg btn-block" id="nextbutton" href="{{ url_for('tossup') }}">Toss Up</a>
