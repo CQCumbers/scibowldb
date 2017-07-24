@@ -38,8 +38,13 @@
             <h5>Bonus - {{ question['category'].title() }} - {{ question['bonus_format'] }}</h5>
             <p>{{ question['bonus_question']|safe  }}</p>
             <p><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
-            <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
-            <button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}"><small>REPORT</small></button>
+            <div class="row">
+                <div class="col-xs-6">
+                    <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
+                    <button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}"><small>REPORT</small></button>
+                </div>
+                <div class="hidden-xs col-xs-6 text-right"><small>Source: {{ question['source'] }}</small></div>
+            </div>
         </div>
     {% endfor %}
 

@@ -202,7 +202,7 @@ def question_report(id, message):
 @app.route('/login', methods=['POST'])
 @limiter.limit("10/day;3/minute")
 def login():
-    user = User() if request.form.get('username') == LOGIN_USERNAME and request.form.get('password') == LOGIN_PASSWORD else None
+    user = User() if request.form.get('username') == app.config['LOGIN_USERNAME'] and request.form.get('password') == app.config['LOGIN_PASSWORD'] else None
     if user is not None:
         login_user(user)
         flash("Login successful!")
