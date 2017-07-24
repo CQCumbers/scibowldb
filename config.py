@@ -16,12 +16,8 @@ SQLALCHEMY_TRACK_MODIFICATIONS = True
 QUESTIONS_PER_PAGE = 10;
 
 # email server
-MAIL_SERVER = 'smtp.gmail.com'
-MAIL_PORT = 465
-MAIL_USE_TLS = False
-MAIL_USE_SSL = True
-MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+MAILGUN_KEY = os.environ.get('MAILGUN_KEY') 
+MAILGUN_DOMAIN = 'scibowldb.com'
 ADMINS = [os.environ.get('MAIL_USERNAME')]
 
 # login stuff

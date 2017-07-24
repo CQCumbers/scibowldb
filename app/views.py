@@ -3,12 +3,10 @@ from urllib.parse import urlparse, urljoin
 from flask_login import current_user, login_user, logout_user, login_required
 import flask_whooshalchemyplus
 from app import app, db, limiter
-from config import QUESTIONS_PER_PAGE, LOGIN_USERNAME, LOGIN_PASSWORD
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import func
-import re, random, ast
+import re, random, ast, requests
 from .models import Question, User
-from .emails import question_report
 
 with app.app_context():
     #flask_whooshalchemyplus.index_all(app)
@@ -118,7 +116,7 @@ def browse(page=1):
     questions = filter().order_by(Question.rand_id)
     if 'search' in session and session['search'] is not None and len(session['search']) > 0:
         questions = questions.whoosh_search(session['search'])
-    questions = questions.paginate(page, QUESTIONS_PER_PAGE, False)
+    questions = questions.paginate(page, app.config['QUESTIONS_PER_PAGE'], False)
     if len(questions.items) <= 0:
         flash("The inputted settings did not match any available questions. Please try again.")
         questions=filter(params=[]).order_by(Question.rand_id).paginate(page, QUESTIONS_PER_PAGE, False)
@@ -187,6 +185,19 @@ def report():
         return flask.abort(400)
     else:
         return redirect(next or url_for('tossup'))
+
+def question_report(id, message):
+    r = requests.post(
+        "https://api.mailgun.net/v3/%s/messages" % app.config['MAILGUN_DOMAIN'],
+        auth=("api", app.config['MAILGUN_KEY']),
+        data={
+            "from": "Scibowldb User <mailgun@{}>".format(app.config['MAILGUN_DOMAIN']),
+            "to": app.config['ADMINS'][0],
+            "subject": "Question {} on scibowldb reported".format(id),
+            "text": "Question {} was reported with the following message:\n{}".format(id,message)
+        }
+     )
+    return r
 
 @app.route('/login', methods=['POST'])
 @limiter.limit("10/day;3/minute")
