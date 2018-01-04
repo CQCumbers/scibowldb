@@ -17,8 +17,7 @@ QUESTIONS_PER_PAGE = 10;
 
 # email server
 MAILGUN_KEY = os.environ.get('MAILGUN_KEY') 
-MAILGUN_DOMAIN = 'scibowldb.com'
-ADMINS = [os.environ.get('MAIL_USERNAME')]
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 
 # login stuff
 LOGIN_USERNAME = os.environ.get('LOGIN_USERNAME')

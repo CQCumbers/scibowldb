@@ -188,11 +188,11 @@ def report():
 
 def question_report(id, message):
     r = requests.post(
-        "https://api.mailgun.net/v3/%s/messages" % app.config['MAILGUN_DOMAIN'],
+        "https://api.mailgun.net/v3/scibowldb.com/messages",
         auth=("api", app.config['MAILGUN_KEY']),
         data={
-            "from": "Scibowldb User <mailgun@{}>".format(app.config['MAILGUN_DOMAIN']),
-            "to": app.config['ADMINS'][0],
+            "from": "ScibowlDB User <mail@scibowldb.com>",
+            "to": app.config['ADMIN_EMAIL'],
             "subject": "Question {} on scibowldb reported".format(id),
             "text": "Question {} was reported with the following message:\n{}".format(id,message)
         }
