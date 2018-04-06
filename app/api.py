@@ -21,12 +21,11 @@ def filter_questions(params, attemptAuth=True):
 # convert questions to json and substitute external URLs
 def make_public(question, html=False):
     new_question = {}
-    for field in question.as_dict():
+    for field, value in question.as_dict().items():
         if field == 'id':
             new_question['api_url'] = url_for('api.get_question', question_id=question.id, _external=True)
             new_question['uri'] = url_for('tossup', question_id=question.id, _external=True)
-        if field != 'rand_id':
-            new_question[field] = question.as_dict()[field]
+        new_question[field] = value
         if html:
             new_question['tossup_question'] = re.sub(r'\n\(?(?P<letter>[WXYZ])', r'<br>\g<letter>', question.tossup_question)
             new_question['bonus_question'] = re.sub(r'\n\(?(?P<letter>[WXYZ])', r'<br>\g<letter>', question.bonus_question)

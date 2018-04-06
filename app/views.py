@@ -1,4 +1,4 @@
-import random, requests, flask_whooshalchemyplus
+import random, requests, sqlalchemy_searchable
 from flask import abort, request, url_for, render_template, session, redirect, flash
 from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urlparse, urljoin
@@ -66,8 +66,8 @@ def bonus():
 @app.route('/browse/<int:page>')
 def browse(page=1):
     questions = filter_questions(session).order_by(Question.id)
-    if 'search' in session and session['search'] is not None and len(session['search']) > 0:
-        questions = questions.whoosh_search(session['search'])
+    if session.get('search'):
+        questions = sqlalchemy_searchable.search(questions, session['search'], sort=True)
     questions = questions.paginate(page, app.config['QUESTIONS_PER_PAGE'], False)
     if len(questions.items) <= 0:
         flash('The inputted settings did not match any available questions. Please try again.')

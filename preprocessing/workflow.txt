@@ -1,0 +1,5 @@
+1. Scan or download science bowl question sets into pdf format
+2. Use ABBY Finereader to OCR to plain text - manually search through for MATH questions and correct errors, convert to Asciimath
+3. If necessary, use splitter.py to split plain text output further into rounds
+4. Make sure major sources are folders, then pdfs and text folders, then text is by round{x}.txt
+5. Use question2db.py to add questions to database
