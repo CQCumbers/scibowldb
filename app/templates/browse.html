@@ -1,103 +1,107 @@
 {% extends "base.html" %}
+
 {% block title %}Browse{% endblock %}
+
 {% block content %}
+  <form action="{{ url_for('search') }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="form-group">
+      <label class="sr-only" for="searchfield">Search</label>
+      <div class="input-group">
+        <input type="text" class="form-control" id="searchfield" placeholder="Search" {% if settings.search %} value="{{ settings.search }}" {% endif %} name="search">
+        <span class="input-group-append">
+          <button class="btn btn-primary px-3" type="submit">Go!</button>
+        </span>
+      </div>
+    </div>
+  </form>
 
-    <form action="{{ url_for('search') }}" method="post">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <div class="form-group">
-            <label class="sr-only" for="searchfield">Search</label>
-            <div class="input-group">
-                <input type="text" class="form-control" id="searchfield" placeholder="Search" {% if settings.search %} value="{{ settings.search }}" {% endif %} name="search">
-                <span class="input-group-btn">
-                    <button class="btn btn-default" type="submit">Go!</button>
-                </span>
-            </div>
-        </div>
-    </form>
+  <span>
+  {{ (pagination.page - 1) * pagination.per_page + 1 }} to {{
+      (pagination.page * pagination.per_page) if pagination.page * pagination.per_page < pagination.total else pagination.total
+  }} of {{ pagination.total }} results.
+  </span>
+  {% if pagination.pages > 1 %}
+  <span class="float-right">
+    <a href="{{ url_for('browse', page=(range(1, pagination.pages + 1) | random)) }}">Random Page</a>
+  </span>
+  {% endif %}
 
-    <div class="row">
-        <div class="col-xs-8">
-            <p>{{ (pagination.page-1)*pagination.per_page + 1 }} to {{ (pagination.page * pagination.per_page) if pagination.page * pagination.per_page < pagination.total else pagination.total }} of {{ pagination.total }} results.</p>
-        </div>
-        <div class="col-xs-4">
-            <p class="text-right">
-                {% if pagination.pages > 1 %}
-                    <a class="btn btn-link btn-xs" href="{{ url_for('browse', page=(range(1,pagination.pages+1)|random)) }}">Random Page</a>
-                {% endif %}
-            </p>
-        </div>
+  {% for question in questions %}
+  <a class="question-anchor"></a>
+  <div class="card my-3">
+    <div class="card-body">
+      <h5>Toss Up - {{ question['category'].title() }} - {{ question['tossup_format'] }}</h5>
+      <p>{{ question['tossup_question']|safe }}</p>
+      <span><strong>ANSWER:</strong> {{ question['tossup_answer'] }}</span>
+      <hr/>
+      <h5>Bonus - {{ question['category'].title() }} - {{ question['bonus_format'] }}</h5>
+      <p>{{ question['bonus_question']|safe  }}</p>
+      <span><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</span>
     </div>
 
-    {% for question in questions %}
-        <a class="question-anchor"></a>
-        <div class="well well-md">
-            <h5>Toss Up - {{ question['category'].title() }} - {{ question['tossup_format'] }}</h5>
-            <p>{{ question['tossup_question']|safe }}</p>
-            <p><strong>ANSWER:</strong> {{ question['tossup_answer'] }}</p>
-            <hr/>
-            <h5>Bonus - {{ question['category'].title() }} - {{ question['bonus_format'] }}</h5>
-            <p>{{ question['bonus_question']|safe  }}</p>
-            <p><strong>ANSWER:</strong> {{ question['bonus_answer'] }}</p>
-            <div class="row">
-                <div class="col-xs-6">
-                    <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
-                    <button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}"><small>REPORT</small></button>
-                </div>
-                <div class="hidden-xs col-xs-6 text-right"><small>Source: {{ question['source'] }}</small></div>
-            </div>
-        </div>
-    {% endfor %}
+    <div class="card-footer text-muted p-0">
+      <button type="button" class="btn btn-link">
+        <a href="{{ question['uri'] }}"><small>Permalink</small></a>
+      </button>
+      <button type="button" class="btn btn-link" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}">
+        <small>Report</small>
+      </button>
+      <span class="btn disabled float-right">
+        <small>{{ question['source'] }}</small>
+      </span>
+    </div>
+  </div>
+  {% endfor %}
 
-    <nav class="text-center">
-        <ul class="pagination">
-            {% if pagination.has_prev %}
-                <li><a href="{{ url_for('browse', page=pagination.prev_num) }}">Previous</a></li>
-            {% else %}
-                <li class="disabled"><span>Previous</span></li>
-            {% endif %}
-            {%for page in pagination.iter_pages() %}
-                {% if page %}
-                    {% if page != pagination.page %}
-                        <li><a href="{{ url_for('browse', page=page) }}">{{ page }}</a></li>
-                    {% else %}
-                        <li class="active"><span>{{ page }}</span></li>
-                    {% endif %}
-                {% else %}
-                    <li class="disabled"><span class=ellipsis>…</span></li>
-                {% endif %}
-            {% endfor %}
-            {% if pagination.has_next %}
-                <li><a href="{{ url_for('browse', page=pagination.next_num) }}">Next</a></li>
-            {% else %}
-                <li class="disabled"><span>Next</span></li>
-            {% endif %}
-        </ul>
-    </nav>
+  <nav>
+    <ul class="pagination justify-content-center">
+      <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+        <a class="page-link" href="{{ url_for('browse', page=pagination.prev_num) }}">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+
+      {% for page in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page %}
+        <li class="page-item {{ 'active' if page == pagination.page }}">
+          <a class="page-link" href="{{ url_for('browse', page=page) }}">{{ page }}</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <a class="page-link ellipsis">…</a>
+        </li>
+        {% endif %}
+      {% endfor %}
+
+      <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+        <a class="page-link" href="{{ url_for('browse', page=pagination.next_num) }}">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 {% endblock %}
 
 {% block scripts %}
 <script>
-var index = -1;
-Mousetrap.bind(['down', 'right', 'n', 'space', 'enter'], function(e) {
-    e.preventDefault();
-    index++;
-    $("html, body").animate({ scrollTop : $('.question-anchor').eq(index).position().top })
+var index = 0;
+keyboardJS.bind(['down', 'right', 'n', 'space', 'enter'], function(e) {
+    if (!$('#searchfield').is(':focus')) {
+        e.preventDefault();
+        index++;
+        $('html, body').animate({ scrollTop: $('.question-anchor').eq(index).offset().top - 70 });
+    }
 });
-Mousetrap.bind(['up', 'left', 'p'], function(e) {
-    e.preventDefault();
-    index--;
-    if(index < 0) { index = 0;}
-    $("html, body").animate({ scrollTop : $('.question-anchor').eq(index).position().top })
+
+keyboardJS.bind(['up', 'left', 'p'], function(e) {
+    if (!$('#searchfield').is(':focus')) {
+        e.preventDefault();
+        index--;
+        if(index < 0) { index = 0;}
+        $('html, body').animate({ scrollTop: $('.question-anchor').eq(index).offset().top - 70 });
+    }
 });
-</script>
-<script>
-$('#report_modal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var question_id = button.data('id') // Extract info from data-* attributes
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-    var modal = $(this)
-    modal.find('.modal-title').text('Report Question ' + question_id)
-    modal.find('.modal-body input').attr('value', question_id)
-})
+
 </script>
 {% endblock %}

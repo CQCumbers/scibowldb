@@ -1,18 +1,16 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+import flask, flask_sqlalchemy, flask_login, flask_wtf.csrf, flask_limiter
 
-app = Flask(__name__)
+app = flask.Flask(__name__, static_folder='static', static_url_path='')
 app.config.from_object('config')
-db = SQLAlchemy(app)
-csrf = CSRFProtect(app)
-login_manager = LoginManager(app)
-limiter = Limiter(app, key_func=get_remote_address)
+csrf = flask_wtf.csrf.CSRFProtect(app)
+db = flask_sqlalchemy.SQLAlchemy(app)
+login_manager = flask_login.LoginManager(app)
+limiter = flask_limiter.Limiter(app, key_func=flask_limiter.util.get_remote_address)
 
-from app import models, views
+from app import models, views, api
+app.register_blueprint(api.api)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return models.User()

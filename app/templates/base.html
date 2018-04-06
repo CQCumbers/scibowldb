@@ -1,120 +1,124 @@
 <!DOCTYPE html>
-<html lang="en" style="position:relative;min-height:100%;">
+<html lang="en">
   <head>
+    <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title>SciBowlDB | {% block title %}{% endblock %}</title>
-    <!-- Completely overkill favicon related stuff -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
-    <link rel="manifest" href="/static/img/manifest.json">
-    <link rel="mask-icon" href="/static/img/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="shortcut icon" href="/static/img/favicon.ico">
-    <meta name="msapplication-config" content="/static/img/browserconfig.xml">
-    <meta name="theme-color" content="#ffffff">
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Bootstrap-select -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.min.css">
-    <!-- Bootswatch-readable -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/readable/bootstrap.min.css" rel="stylesheet">
-    <!-- Ladda CSS -->
-    <link rel="stylesheet" href="/static/css/ladda-themeless.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.0-beta/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda-themeless.min.css">
 
     <!-- MathJax -->
-    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=AM_CHTML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({SVG: {linebreaks: {automatic: true}}});</script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=AM_SVG"></script>
   </head>
-  <body style="margin-bottom:50px">
-    <nav class="navbar navbar-default">
+  <body style="display: flex; min-height: 100vh; flex-direction: column;">
+    <nav class="navbar navbar-light bg-light navbar-expand-md fixed-top">
       <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">
-            <span><img src="/static/img/logo.png" width="25" height="25"></span>
-            <strong>&nbsp;SciBowl</strong>DB
-          </a>
-        </div>
+        <a class="navbar-brand text-primary" href="#top">
+          <h4 class="my-0">
+            <img class="mb-1" src="/img/logo.svg" width=24 height=24>
+            <strong>SciBowl</strong>DB
+          </h4>
+        </a>
+        <button class="navbar-toggler" data-toggle="collapse" data-target="#navLinks">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li {% if self.title() in ['Tossup', 'Bonus'] %} class="active" {% endif %}><a href="{{ url_for('tossup') }}"> Play {% if self.title() in ['Tossup', 'Bonus'] %}<span class="sr-only">(current)</span>{% endif %}</a></li>
-            <li {% if self.title() == 'Browse' %} class="active" {% endif %}><a href="{{ url_for('browse') }}"> Browse {% if self.title() == 'Browse' %}<span class="sr-only">(current)</span>{% endif %}</a></li>
-            <li {% if self.title() == 'Round' %} class="active" {% endif %}><a href="{{ url_for('round') }}"> Round {% if self.title() == 'Round' %}<span class="sr-only">(current)</span>{% endif %}</a></li>
-            <li {% if self.title() == 'About' %} class="active" {% endif %}><a href="{{ url_for('about') }}"> About {% if self.title() == 'About' %}<span class="sr-only">(current)</span>{% endif %}</a></li>
+        <div class="collapse navbar-collapse justify-content-end" id="navLinks">
+          <ul class="nav nav-pills">
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if self.title() in ['Tossup', 'Bonus'] }}" href="{{ url_for('tossup') }}">Play</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if self.title() == 'Browse' }}" href="{{ url_for('browse') }}">Browse</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if self.title() == 'Round' }}" href="{{ url_for('round') }}">Round</a>
+            </li>
+            <li class="nav-item"> 
+              <a class="nav-link {{ 'active' if self.title() == 'About' }}" href="{{ url_for('about') }}">About</a>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-9 form-group">
+    <main class="container mt-4 pt-5" id="top" style="flex: 1;">
+      <div class="row flex-row-reverse">
+        <div class="col-md-3 d-print-none">
+          <button class="btn btn-light btn-block mb-3 d-md-none" type="button" data-toggle="collapse" data-target="#settings">Settings</button>
+          <div class="mb-3 collapse d-md-block" id="settings">{% include "settings.html" %}</div>
+        </div>
+
+        <div class="col-md">
         {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          {% for message in messages %}
-          <div class="alert alert-warning alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            {{ message }}
-          </div>
-          {% endfor %}
-        {% endif %}
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-warning alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              {{ message }}
+            </div>
+            {% endfor %}
+          {% endif %}
         {% endwith %}
 
         {% include "report_modal.html" %}
         {% include "login_modal.html" %}
 
-        {% block content %}
-        {% endblock %}
-        <br/>
-        </div>
-        <div class="col-sm-3 form-group">
-          {% include "settings.html" %}
-          <br/>
+        {% block content %}{% endblock %}
         </div>
       </div>
-    </div>
+    </main>
 
-    <footer style="position:absolute;bottom:0;width:100%;height:65px;background-color:#f7f7f7">
-      <div class="container hidden-print">
-        {% if current_user.is_authenticated %}
-        <form id="logout-form" action="{{ url_for('logout', next=request.endpoint)  }}" method="post">
+    <footer class="footer bg-light d-print-none">
+      <div class="container py-2">
+      {% if current_user.is_authenticated %}
+        <form class="d-inline" id="logout-form" action="{{ url_for('logout', next=request.endpoint)  }}" method="post">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" class="btn btn-link navbar-btn pull-left">Logout</button>
+          <button type="submit" class="btn btn-link">Logout</button>
         </form>
-        {% else %}
-        <button type="button" class="btn btn-link navbar-btn pull-left" data-toggle="modal" data-target="#login_modal">Login</button>
-        {% endif %}
-        <p class="navbar-text pull-right text-muted">Created by <a href="http://github.com/CQCumbers">CQ_Cumbers</a></p>
+      {% else %}
+        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#login_modal">Login</button>
+      {% endif %}
+        <button class="btn btn-light disabled float-right">Created by <a href="http://github.com/CQCumbers">CQCumbers</a></button>
       </div>
     </footer>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <!-- Bootstrap-select Javascript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.min.js"></script>
-    <!-- Mousetrap Javascript -->
-    <script src="/static/js/mousetrap.min.js"></script>
+    <!-- jQuery, Popper, and Bootstrap JS. -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap-select JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.0-beta/js/bootstrap-select.min.js"></script>
+    <!-- Keyboard JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/keyboardjs/2.4.1/keyboard.js"></script>
+    <!-- Ladda JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/spin.min.js"></script>
+    <script>
+    Ladda.bind('.ladda-button');
+
+    $('#report_modal').on('show.bs.modal', function (e) {
+        var button = $(e.relatedTarget);
+        var question_id = button.data('id');
+        var modal = $(this);
+        modal.find('.modal-title').text('Report Question ' + question_id);
+        modal.find('.modal-body input').attr('value', question_id);
+    })
+    </script>
 
     {% block scripts %}{% endblock %}
-
-    <!-- Ladda JS -->
-    <script src="/static/js/spin.min.js"></script>
-    <script src="/static/js/ladda.min.js"></script>
-    <script>Ladda.bind('.ladda-button');</script>
   </body>
 </html>

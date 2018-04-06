@@ -1,38 +1,73 @@
 {% extends "base.html" %}
+
 {% block title %}About{% endblock %}
+
 {% block content %}
-    <h4>About this Project</h4>
-    <p>SciBowlDB OCRs, analyzes, and categorizes DOE High School Science Bowl questions from several online sources to create a comprehensive, searchable database of <strong>{{ num_questions }}</strong> toss-up and bonus questions, more than any other single source on the Internet, all separated into question text and answer text, and categorized by format, subject, and source. Questions are from either the <a href='https://science.energy.gov/wdts/nsb/regional-competitions/resources/hs-sample-questions/'>official sample question sets</a>, the <a href="http://www.cs.csubak.edu/ScienceBowl/">California State University Bakersfield (CSUB) Regionals question set</a>, or the <a href="http://students.brown.edu/Brown_University_Science_Bowl/practice.html">1998 or 2005 Nationals question sets</a> as compiled by New England Science Bowl.</p>
-    <p>You can use the "Play" tab to quiz yourself on random questions in a certain category, one at a time, or you can use it as a continuous source of questions for team tryouts or practices. "Browse" can be used to search for all questions meeting certain criteria for in-depth study of a certain subject, whether by yourself or as a team. "Round" is useful for generating full, 25-question practice rounds that can be used in team practices or invitationals. If you see any formatting errors or incorrect answers on a question, don't be afraid to report the relevant question for review.</p>
-    <p>You can also use keyboard shortcuts to navigate this website. In play mode, pressing <kbd>enter</kbd>, <kbd>space</kbd>, <kbd>n</kbd>, <kbd><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></kbd>, or <kbd><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></kbd> will show the answer and then advance to the next question. In browse mode, pressing <kbd>enter</kbd>, <kbd>space</kbd>, <kbd>n</kbd>, <kbd><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></kbd>, or <kbd><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></kbd> will scroll down to the next question on the page, while pressing <kbd>p</kbd>, <kbd><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span></kbd>, or <kbd><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></kbd> will scroll up to the previous question.
-    <hr/>
-    <h4>Using the SciBowlDB API</h4>
-    <p>Currently, SciBowlDB has two API endpoints, at <code>{{ url_for('get_questions') }}</code> and at <code>{{ url_for('get_random_question') }}</code>.</p>
-    <p>You can send a GET request to <code>{{ url_for('get_questions') }}</code> to get a JSON object containing a list of all the questions in the database. The object will have the following format:</p>
-    <pre>
+<h4>About this Project</h4>
+<p>SciBowlDB aggregates DOE High School Science Bowl questions from numerous online and offline sources to create a comprehensive, searchable database of high-quality questions for study and practice. Currently, <strong>{{ num_questions }}</strong> pairs of toss-up and bonus questions are publicly available, and have separated into question and answer text as well as categorized by format, subject, and source. The original question sources include the <a href='https://science.energy.gov/wdts/nsb/regional-competitions/resources/hs-sample-questions/'>official sample question sets</a>, the <a href="http://www.cs.csubak.edu/ScienceBowl/">CSUB Regionals question set</a>, and the <a href="http://students.brown.edu/Brown_University_Science_Bowl/practice.html">1998 & 2005 Nationals question sets</a> as compiled by New England Science Bowl</p>
+<p>You can use the "Play" tab to quiz yourself on random questions in a certain category or to provide a continuous source of questions for team tryouts or practices. "Browse" can be used to search for all questions meeting certain criteria for in-depth study of a certain subject. "Round" is useful for generating full, 25-question practice rounds that can be used in team practices or invitationals. If you see any formatting errors or incorrect answers on a question, please report the relevant question for review.</p>
+<p>You can also use keyboard shortcuts to navigate this website. In play mode, pressing <kbd>enter</kbd>, <kbd>space</kbd>, <kbd>n</kbd>, <kbd>&rarr;</kbd>, or <kbd>&darr;</kbd> will show the answer and then advance to the next question. In browse mode, pressing <kbd>enter</kbd>, <kbd>space</kbd>, <kbd>n</kbd>, <kbd>&rarr;</kbd>, or <kbd>&darr;</kbd> will scroll down to the next question on the page, while pressing <kbd>p</kbd>, <kbd>&larr;</kbd>, or <kbd>&uarr;</kbd> will scroll up to the previous question.
+<hr/>
+
+<h4>Using the SciBowlDB API</h4>
+<p>Currently, SciBowlDB has two API endpoints, at <code>{{ url_for('api.get_questions') }}</code> and at <code>{{ url_for('api.get_random_question') }}</code>.</p>
+<p>You can send a <code>GET</code> request to <code>{{ url_for('api.get_questions') }}</code> to get a JSON object containing a list of all the questions in the database. The object will have the following format:</p>
+<pre>
+  <code>
 {
-  "questions": [
-	{
-      "api_url": "scibowldb.com/api/v1.0/questions/1", 
-      "bonus_answer": "PHAGOCYTOSIS", 
-      "bonus_format": "Short Answer", 
-      "bonus_question": "What is the biological term most often used for the act of a cell engulfing a particle by extending its pseudopodia (read as: SU-doe-POH-dee-ah) around the particle?", 
-      "category": "BIOLOGY", 
-      "id": 1, 
-      "source": "Official-set1-round1", 
-      "tossup_answer": "PHENOTYPE", 
-      "tossup_format": "Short Answer", 
-      "tossup_question": "What is the most common term used in genetics to describe the observable physical characteristics of an organism caused by the expression of a gene or set of genes?", 
-      "uri": "scibowldb.com/tossup/1"
-    },
+  "questions": [{
+      "api_url": "API URL of question", 
+      "bonus_answer": "BONUS ANSWER", 
+      "bonus_format": "Short Answer/Bonus", 
+      "bonus_question": "Bonus question text"
+      "category": "CATEGORY", 
+      "id": question number, 
+      "source": "Source of question", 
+      "tossup_answer": "TOSSUP ANSWER", 
+      "tossup_format": "Short Answer/Bonus", 
+      "tossup_question": "Tossup question text"
+      "uri": "permalink to question"
+    }, etc. ]
+}
+  </code>
+</pre>
+<p>Sending a <code>GET</code> request to <code>{{ url_for('api.get_random_question') }}</code> will similarly return a JSON object, containing one random question in the database.</p>
+<p>To filter what categories or sources of questions can be returned, you can send a <code>POST</code> request to one of these endpoints. You can specify which categories of questions may be included by adding a list of categories to the JSON body of the <code>POST</code> request. Categories may be one or more of the following:</p>
+<pre>
+  <code>
+{
+  "categories": [
+    "PHYSICS",
+    "GENERAL SCIENCE",
+    "ENERGY",
+    "EARTH AND SPACE",
+    "EARTH SCIENCE",
+    "CHEMISTRY",
+    "BIOLOGY",
+    "ASTRONOMY",
+    "MATH",
+    "COMPUTER SCIENCE",
   ]
-}</pre>
-    <p>Sending a GET request to <code>{{ url_for('get_random_question') }}</code> will similarly return a JSON object, containing one random question in the database.</p>
-    <p>To filter what categories or sources of questions can be returned, you can send a POST request to one of these endpoints. You can specify which categories of questions may be included by adding a list of categories to the JSON body of the POST request. Categories may be one or more of the following:</p>
-    <pre>{"categories": ["PHYSICS", "GENERAL SCIENCE", "ENERGY", "EARTH AND SPACE", "EARTH SCIENCE",
-        "CHEMISTRY", "BIOLOGY", "ASTRONOMY", "MATH", "COMPUTER SCIENCE"]}</pre>
-    <p>You can also specify which sources of questions may be included by adding a list of sources to the JSON body of the POST request. The API will return all questions that begin with the name of the source listed. For example,
-    <pre>curl -X POST -d '{"sources": ["Official", "CSUB"]}' "http://cqcumbers.pythonanywhere.com/api/v1.0/questions/"</pre>
-    will return all questions whose source names begin with "Official" or "CSUB", including "Official-set1-round1", "CSUB-round4", and "Official-set4-round10". The same POST request body sent to the <code>{{ url_for('get_random_question') }}</code> endpoint would return a random question following the same restrictions. The top-level sources are:</p>
-    <pre>{"sources": ["Official", "CSUB", "05Nats", "98Nats"]}</pre>
+}
+  </code>
+</pre>
+<p>You can also specify which sources of questions may be included by adding a list of sources to the JSON body of the <code>POST</code> request. The API will return all questions that begin with the name of the source listed. For example:</p>
+<pre>
+  <code>
+curl -X POST -d '{"sources": ["Official", "CSUB"]}' "http://scibowldb.com/api/questions"
+  </code>
+</pre>
+<p>will return all questions whose source names begin with "Official" or "CSUB", including "Official-set1-round1", "CSUB-round4", and "Official-set4-round10". The same POST request body sent to the <code>{{ url_for('api.get_random_question') }}</code> endpoint would return a random question following the same restrictions. The top-level sources are:</p>
+<pre>
+  <code>
+{
+  "sources": [
+    "Official",
+    "CSUB",
+    "05Nats",
+    "98Nats",
+  ]
+}
+  </code>
+</pre>
 {% endblock %}

@@ -1,47 +1,49 @@
 {% extends "base.html" %}
+
 {% block title %}Tossup{% endblock %}
+
 {% block content %}
-<div class="well well-lg">
+<div class="card mb-3">
+  <div class="card-body">
     <h4>Toss Up - {{ question['category'].title() }} - {{ question['tossup_format'] }}</h4>
-    <p class="lead">{{ question['tossup_question']|safe }}</p>
-    <div class="collapse" id="answerbox">
-        <p class="lead"><strong>ANSWER:</strong> {{ question['tossup_answer'] }}</p>
-        <div class="row">
-            <div class="col-xs-6">
-                <button type="button" class="btn btn-link btn-xs"><a href="{{ question['uri'] }}"><small>PERMALINK</small></a></button>
-                <button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}"><small>REPORT</small></button>
-            </div>
-            <div class="hidden-xs col-xs-6 text-right"><small>Source: {{ question['source'] }}</small></div>
-        </div>
+    <p class="lead mb-0">{{ question['tossup_question']|safe }}</p>
+  </div>
+
+  <div class="collapse toggled">
+    <div class="card-body lead pt-0">
+      <strong>ANSWER:</strong> {{ question['tossup_answer'] }}
     </div>
+    
+    <div class="card-footer text-muted p-0 d-print-none">
+      <button type="button" class="btn btn-link">
+        <a href="{{ question['uri'] }}"><small>Permalink</small></a>
+      </button>
+      <button type="button" class="btn btn-link" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}">
+        <small>Report</small>
+      </button>
+      <span class="btn disabled float-right">
+        <small>{{ question['source'] }}</small>
+      </span>
+    </div>
+  </div>
 </div>
 
-<div class="collapse in" id="showbuttonbox">
-    <button class="btn btn-primary btn-lg btn-block" id="showbutton" type="button" data-toggle="collapse" data-target="#answerbox,#showbuttonbox,#nextbuttonbox">Answer</button>
+<div class="collapse show toggled">
+  <button id="showButton" class="btn btn-primary btn-lg btn-block mb-3" type="button" data-toggle="collapse" data-target=".toggled">Answer</button>
 </div>
-<div class="collapse" id="nextbuttonbox">
-    <a class="btn btn-primary btn-lg btn-block" id="nextbutton" href="{{ url_for('bonus') }}">Bonus</a>
+<div class="collapse toggled">
+  <a id="nextButton" class="btn btn-primary btn-lg btn-block mb-3" href="{{ url_for('bonus') }}">Bonus</a>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-Mousetrap.bind(['down', 'right', 'n', 'space', 'enter'], function() {
-    if ($('#nextbuttonbox').is(':hidden')) {
-        $('#showbutton').click();
+keyboardJS.bind(['down', 'right', 'n', 'space', 'enter'], function() {
+    if ($('#nextButton').is(':hidden')) {
+        $('#showButton').click();
     } else {
-        $('#nextbutton')[0].click();
+        window.location.href = $('#nextButton').attr('href');
     }
 });
-</script>
-<script>
-$('#report_modal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var question_id = button.data('id') // Extract info from data-* attributes
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-    var modal = $(this)
-    modal.find('.modal-title').text('Report Question ' + question_id)
-    modal.find('.modal-body input').attr('value', question_id)
-})
 </script>
 {% endblock %}

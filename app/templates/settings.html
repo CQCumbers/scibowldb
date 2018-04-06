@@ -1,23 +1,24 @@
-<form class="hidden-print" action="{{ url_for('settings', next=request.endpoint) }}" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    <fieldset>
+<form action="{{ url_for('settings', next_url=request.endpoint) }}" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <fieldset>
     <legend>Settings</legend>
+    <hr class="mt-0" />
     <div class="form-group">
-        <label for="categoryselect">Categories</label>
-        <select multiple id="categoryselect" name="category" class="selectpicker" data-actions-box="true">
-            {% for category in categories %}
-            <option value="{{ category }}" {% if category in settings.categories %} selected="selected" {% endif %}>{{ category.title() }}</option>
-            {% endfor %}
-        </select>
+      <label class="form-row" for="categoryselect">Categories</label>
+      <select multiple id="categoryselect" name="category" class="selectpicker" data-actions-box="true">
+      {% for category in categories %}
+        <option value="{{ category }}" {% if category in settings.categories %} selected="selected" {% endif %}>{{ category.title() }}</option>
+      {% endfor %}
+      </select>
     </div>
     <div class="form-group">
-        <label for="sourceselect">Sources</label>
-        <select multiple id="sourceselect" name="source" class="selectpicker" data-actions-box="true">
-            {% for source in sources %}
-            <option value="{{ source }}" {% if source in settings.sources %} selected="selected" {% endif %}>{{ source }}</option>
-            {% endfor %}
-        </select>
-        </div>
-    <button type="submit" class="btn btn-default">Submit</button>
-    </fieldset>
+      <label class="form-row" for="sourceselect">Sources</label>
+      <select multiple id="sourceselect" name="source" class="selectpicker" data-actions-box="true">
+      {% for source in sources %}
+        <option value="{{ source }}" {% if source in settings.sources %} selected="selected" {% endif %}>{{ source }}</option>
+      {% endfor %}
+      </select>
+      </div>
+    <button type="submit" class="btn btn-secondary mt-2 px-3">Submit</button>
+  </fieldset>
 </form>
