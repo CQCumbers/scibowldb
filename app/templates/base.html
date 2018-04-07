@@ -74,8 +74,9 @@
           {% endif %}
         {% endwith %}
 
-        {% include "report_modal.html" %}
-        {% include "login_modal.html" %}
+        {% include 'report_modal.html' %}
+        {% include 'edit_modal.html' %}
+        {% include 'login_modal.html' %}
 
         {% block content %}{% endblock %}
         </div>
@@ -85,7 +86,7 @@
     <footer class="footer bg-light d-print-none">
       <div class="container py-2">
       {% if current_user.is_authenticated %}
-        <form class="d-inline" id="logout-form" action="{{ url_for('logout', next=request.endpoint)  }}" method="post">
+        <form class="d-inline" id="logout-form" action="{{ url_for('logout', next_url=request.endpoint)  }}" method="post">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button type="submit" class="btn btn-link">Logout</button>
         </form>
@@ -100,25 +101,37 @@
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
-    <!-- Bootstrap-select JS -->
+    <!-- Bootstrap-select, Keyboard, and Ladda JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.0-beta/js/bootstrap-select.min.js"></script>
-    <!-- Keyboard JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/keyboardjs/2.4.1/keyboard.js"></script>
-    <!-- Ladda JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/spin.min.js"></script>
     <script>
     Ladda.bind('.ladda-button');
 
     $('#report_modal').on('show.bs.modal', function (e) {
-        var button = $(e.relatedTarget);
+        var button = $(e.relatedTarget), modal = $(this);
         var question_id = button.data('id');
-        var modal = $(this);
-        modal.find('.modal-title').text('Report Question ' + question_id);
-        modal.find('.modal-body input').attr('value', question_id);
+        $(this).find('.modal-title').text('Report Question ' + question_id);
+        $(this).find('#report_id').val(question_id);
     })
-    </script>
 
+    {% if current_user.is_authenticated %}
+    $('#edit_modal').on('show.bs.modal', function (e) {
+        var button = $(e.relatedTarget), modal = $(this);
+        var question_id = button.data('id');
+        modal.find('.modal-title').text('Edit Question ' + question_id);
+        modal.find('#edit_id').val(question_id);
+        $.get('{{ url_for("api.get_question", question_id=0) }}' + question_id, function(q) {
+            modal.find('#tossup_question').val(q.question.tossup_question);
+            console.log(modal.find('#tossup_question'));
+            modal.find('#tossup_answer').val(q.question.tossup_answer);
+            modal.find('#bonus_question').val(q.question.bonus_question);
+            modal.find('#bonus_answer').val(q.question.bonus_answer);
+        })
+    })
+    {% endif %}
+    </script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

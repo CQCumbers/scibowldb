@@ -28,6 +28,11 @@
       <button type="button" class="btn btn-link" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}">
         <small>Report</small>
       </button>
+      {% if current_user.is_authenticated %}
+      <button type="button" class="btn btn-link" data-toggle="modal" data-target="#edit_modal" data-id="{{ question['id'] }}">
+        <small>Edit</small>
+      </button>
+      {% endif %}
       <span class="btn disabled float-right">
         <small>{{ question['source'] }}</small>
       </span>
@@ -40,16 +45,20 @@
 <script>
 var index = 0;
 keyboardJS.bind(['down', 'right', 'n', 'space', 'enter'], function(e) {
-    e.preventDefault();
-    index++;
-    $('html, body').animate({ scrollTop: $('.question-anchor').eq(index).offset().top - 70 });
+    if (!$('input').is(':focus')) {
+        e.preventDefault();
+        index++;
+        $('html, body').animate({ scrollTop: $('.question-anchor').eq(index).offset().top - 70 });
+    }
 });
 
 keyboardJS.bind(['up', 'left', 'p'], function(e) {
-    e.preventDefault();
-    index--;
-    if(index < 0) { index = 0;}
-    $('html, body').animate({ scrollTop: $('.question-anchor').eq(index).offset().top - 70 });
+    if (!$('input').is(':focus')) {
+        e.preventDefault();
+        index--;
+        if(index < 0) { index = 0;}
+        $('html, body').animate({ scrollTop: $('.question-anchor').eq(index).offset().top - 70 });
+    }
 });
 </script>
 {% endblock %}

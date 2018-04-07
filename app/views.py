@@ -6,7 +6,7 @@ from sqlalchemy.sql.expression import func
 
 from app import app, limiter
 from .api import filter_questions, make_public
-from .models import Question, User, all_sources, all_categories, free_sources
+from .models import Question, User, db, all_sources, all_categories, free_sources
 
 
 def is_safe_url(target):
@@ -128,8 +128,8 @@ def search():
 @limiter.limit('25/day; 3/minute')
 def report():
     question_report(request.form.get('id'), request.form.get('message'))
+
     flash('Thank you for reporting a question in need of improvement!')
-    
     next_url = request.args.get('next_url')
     return redirect(next_url) if is_safe_url(next_url) else redirect(url_for('tossup'))
 
@@ -159,6 +159,22 @@ def login():
 
     next_url = request.args.get('next_url')
     return redirect(next_url or url_for('tossup')) if is_safe_url(next_url) else abort(400)
+
+
+@app.route('/edit', methods=['POST'])
+@login_required
+def edit():
+    question = Question.query.get(request.form.get('id'))
+
+    question.tossup_question = request.form.get('tossup_question')
+    question.tossup_answer = request.form.get('tossup_answer')
+    question.bonus_question = request.form.get('bonus_question')
+    question.bonus_answer = request.form.get('bonus_answer')
+    db.session.commit()
+
+    flash('Your edit to question {} was processed'.format(question.id))
+    next_url = request.args.get('next_url')
+    return redirect(next_url) if is_safe_url(next_url) else redirect(url_for('tossup'))
 
 
 @app.route('/logout', methods=['POST'])

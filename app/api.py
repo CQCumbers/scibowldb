@@ -34,7 +34,7 @@ def make_public(question, html=False):
 
 @api.route('/questions', methods=['GET'])
 def get_questions():
-    questions = filter_questions({}, attemptAuth=False)
+    questions = filter_questions({})
     return jsonify({'questions': [make_public(q) for q in questions]})
 
 
@@ -42,13 +42,13 @@ def get_questions():
 @api.route('/questions', methods=['POST'])
 def get_questions_filtered():
     if not request.json: abort(400)
-    questions = filter_questions(request.json, attemptAuth=False).all()
+    questions = filter_questions(request.json).all()
     return jsonify({'questions': [make_public(q) for q in questions]})
 
 
 @api.route('/questions/random', methods=['GET'])
 def get_random_question():
-    questions = filter_questions({}, attemptAuth=False)
+    questions = filter_questions({})
     question = random.choice(questions)
     return jsonify({'question': make_public(question)})
 
@@ -56,14 +56,14 @@ def get_random_question():
 @api.route('/questions/random', methods=['POST'])
 def get_random_question_filtered():
     if not request.json: abort(400)
-    question = random.choice(filter(request.json, attemptAuth=False).all())
+    question = random.choice(filter(request.json).all())
     return jsonify({'question': make_public(question)})
 
 
 @api.route('/questions/<int:question_id>', methods=['GET'])
 def get_question(question_id):
     question = Question.query.get_or_404(question_id)
-    if question not in filter({}, attemptAuth=False): abort(404)
+    if question not in filter_questions({}): abort(404)
     return jsonify({'question': make_public(question)})
 
 

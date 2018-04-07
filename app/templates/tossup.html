@@ -21,6 +21,11 @@
       <button type="button" class="btn btn-link" data-toggle="modal" data-target="#report_modal" data-id="{{ question['id'] }}">
         <small>Report</small>
       </button>
+      {% if current_user.is_authenticated %}
+      <button type="button" class="btn btn-link" data-toggle="modal" data-target="#edit_modal" data-id="{{ question['id'] }}">
+        <small>Edit</small>
+      </button>
+      {% endif %}
       <span class="btn disabled float-right">
         <small>{{ question['source'] }}</small>
       </span>
@@ -39,10 +44,12 @@
 {% block scripts %}
 <script>
 keyboardJS.bind(['down', 'right', 'n', 'space', 'enter'], function() {
-    if ($('#nextButton').is(':hidden')) {
-        $('#showButton').click();
-    } else {
-        window.location.href = $('#nextButton').attr('href');
+    if (!$('textarea').is(':focus')) {
+        if ($('#nextButton').is(':hidden')) {
+            $('#showButton').click();
+        } else {
+            window.location.href = $('#nextButton').attr('href');
+        }
     }
 });
 </script>

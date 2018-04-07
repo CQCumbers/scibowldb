@@ -1,0 +1,38 @@
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <form id="edit_form" action="{{ url_for('edit', next_url=request.endpoint)  }}" method="post">
+        <div class="modal-header">
+          <h5 class="modal-title" id="edit_modal_label">Edit Question</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <input type="hidden" name="id" id="edit_id">
+
+          <label for="tossup_question" class="form-control-label">Tossup Question</label>
+          <textarea name="tossup_question" class="form-control" id="tossup_question" rows="5"></textarea>
+
+          <label for="tossup_answer" class="form-control-label">Tossup Answer</label>
+          <textarea name="tossup_answer" class="form-control" id="tossup_answer" rows="2"></textarea>
+
+          <label for="bonus_question" class="form-control-label">Bonus Question</label>
+          <textarea name="bonus_question" class="form-control" id="bonus_question" rows="5"></textarea>
+
+          <label for="bonus_answer" class="form-control-label">Bonus Answer</label>
+          <textarea name="bonus_answer" class="form-control" id="bonus_answer" rows="2"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary ladda-button" data-style="expand-right">
+            <span class="ladda-label">Submit Edit</span><span class="ladda-spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
