@@ -36,6 +36,6 @@ class User(UserMixin):
 
 db.configure_mappers()
 db.create_all()
-all_sources = set([question.source.split('-')[0] for question in Question.query.distinct(Question.source)])
-all_categories = set([question.category for question in Question.query.distinct(Question.category)])
+all_sources = set([source[0].split('-')[0] for source in db.session.query(Question.source).distinct()])
+all_categories = set([category[0] for category in db.session.query(Question.category).distinct()])
 free_sources = set(['Official', '98Nats', '05Nats', 'CSUB', '16Exchange', 'HW'])

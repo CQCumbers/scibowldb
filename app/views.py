@@ -5,34 +5,37 @@ from urllib.parse import urlparse, urljoin
 from sqlalchemy.sql.expression import func
 
 from app import app, limiter
-from .api import filter_questions, make_public
+from .api import filter_questions, get_ids, make_public
 from .models import Question, User, db, all_sources, all_categories, free_sources
 
 
+# make url safe for redirects
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 
+# get random question from settings, with question id override
+def play_question(question_id=None):
+    if question_id and question_id in get_ids():
+        question = db.session.query(Question).get(question_id)
+    else:
+        sources, categories = session.get('sources'), session.get('categories')
+        question = filter_questions(sources, categories).order_by(func.random()).first()
+        # reset settings if they match no questions
+        if not question:
+            flash('The inputted settings did not match any available questions. Please try again.')
+            session['categories'], session['sources'] = (), ()
+            question = filter_questions().order_by(func.random()).first()
+    return question
+
+
 @app.route('/')
 @app.route('/tossup')
 @app.route('/tossup/<int:question_id>')
 def tossup(question_id=None):
-    if question_id:
-        question = Question.query.get(question_id)
-        if question not in filter_questions({}):
-            return redirect(url_for('tossup'))
-    else:
-        questions = filter_questions(session).all()
-        # reset settings if they match no questions
-        if len(questions) <= 0:
-            flash('The inputted settings did not match any available questions. Please try again.')
-            session['categories'], session['sources'] = [], []
-            questions = filter_questions({}).all()
-        question = random.choice(questions)
-
-    session['question_id'] = question.id
+    question = play_question(question_id)
     sources = all_sources if current_user.is_authenticated else free_sources
     return render_template(
         'tossup.html', settings=session, sources=sources,
@@ -41,20 +44,9 @@ def tossup(question_id=None):
 
 
 @app.route('/bonus')
-def bonus():
-    if 'question_id' in session:
-        question = Question.query.get(session['question_id'])
-        if question not in filter_questions({}):
-            session['question_id'] = None
-            return redirect(url_for('bonus'))
-    else:
-        questions = filter_questions(session).all()
-        if len(questions) <= 0:
-            flash('The inputted settings did not match any available questions. Please try again.')
-            session['categories'], session['sources'] = [], []
-            questions = filter_questions({}).all()
-        question = random.choice(questions)
-
+@app.route('/bonus/<int:question_id>')
+def bonus(question_id=None):
+    question = play_question(question_id)
     sources = all_sources if current_user.is_authenticated else free_sources
     return render_template(
         'bonus.html', settings=session, sources=sources,
@@ -65,15 +57,16 @@ def bonus():
 @app.route('/browse')
 @app.route('/browse/<int:page>')
 def browse(page=1):
-    questions = filter_questions(session).order_by(Question.id)
-    if session.get('search'):
+    sources, categories = session.get('sources'), session.get('categories')
+    questions = filter_questions(sources, categories).order_by(Question.id)
+    if session.get('search') and len(session['search']) > 0:
         questions = sqlalchemy_searchable.search(questions, session['search'], sort=True)
     questions = questions.paginate(page, app.config['QUESTIONS_PER_PAGE'], False)
-    if len(questions.items) <= 0:
+    if len(questions.items) < 1:
         flash('The inputted settings did not match any available questions. Please try again.')
-        session['categories'], session['sources'] = [], []
+        session['categories'], session['sources'] = (), ()
         session['search'] = ''
-        questions=filter_questions({}).order_by(Question.id).paginate(page, app.config['QUESTIONS_PER_PAGE'], False)
+        questions=filter_questions().order_by(Question.id).paginate(page, app.config['QUESTIONS_PER_PAGE'], False)
 
     sources = all_sources if current_user.is_authenticated else free_sources
     return render_template(
@@ -85,13 +78,14 @@ def browse(page=1):
 
 @app.route('/round')
 def round():
-    questions = filter_questions(session).order_by(func.random()).limit(25).all()
-    if len(questions) <= 0:
+    sources, categories = session.get('sources'), session.get('categories')
+    questions = filter_questions(sources, categories).order_by(func.random()).limit(25).all()
+    if len(questions) < 1:
         flash('The inputted settings did not match any available questions. Please try again.')
         session['categories'], session['sources'] = [], []
-        questions=filter_questions({}).order_by(func.random()).limit(25).all()
-    sources = all_sources if current_user.is_authenticated else free_sources
+        questions=filter_questions().order_by(func.random()).limit(25).all()
 
+    sources = all_sources if current_user.is_authenticated else free_sources
     return render_template(
         'round.html', settings=session, sources=sources, categories=all_categories,
         questions=[make_public(question, html=True) for question in questions],
@@ -102,17 +96,16 @@ def round():
 @app.route('/about')
 def about():
     sources = all_sources if current_user.is_authenticated else free_sources
-    # counting both tossup and bonuses
     return render_template(
-        'about.html', settings=session, sources=sources, categories=all_categories,
-        num_questions=len(list(filter_questions({})))
+        'about.html', settings=session, sources=sources,
+        categories=all_categories, num_questions=len(get_ids())
     )
 
 
 @app.route('/settings', methods=['POST'])
 def settings():
-    session['categories'] = request.form.getlist('category')
-    session['sources'] = request.form.getlist('source')
+    session['categories'] = tuple(request.form.getlist('category'))
+    session['sources'] = tuple(request.form.getlist('source'))
 
     next_url = request.args.get('next_url')
     return redirect(next_url) if is_safe_url(next_url) else redirect(url_for('tossup'))
