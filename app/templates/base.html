@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
+    <!-- Standard Meta -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -13,14 +13,15 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.0-beta/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda-themeless.min.css">
 
     <!-- MathJax -->
     <script type="text/x-mathjax-config">MathJax.Hub.Config({SVG: {linebreaks: {automatic: true}}});</script>
-    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=AM_SVG"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=AM_SVG"></script>
   </head>
+
   <body style="display: flex; min-height: 100vh; flex-direction: column;">
     <nav class="navbar navbar-light bg-light navbar-expand-md fixed-top">
       <div class="container">
@@ -61,18 +62,14 @@
         </div>
 
         <div class="col-md">
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-warning alert-dismissible" role="alert">
-              <button type="button" class="close" data-dismiss="alert">
-                <span aria-hidden="true">&times;</span>
-              </button>
-              {{ message }}
-            </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          {{ message }}
+        </div>
+        {% endfor %}
 
         {% include 'report_modal.html' %}
         {% include 'edit_modal.html' %}
@@ -85,52 +82,56 @@
 
     <footer class="footer bg-light d-print-none">
       <div class="container py-2">
-      {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated %}
         <form class="d-inline" id="logout-form" action="{{ url_for('logout', next_url=request.endpoint)  }}" method="post">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button type="submit" class="btn btn-link">Logout</button>
         </form>
-      {% else %}
+        {% else %}
         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#login_modal">Login</button>
-      {% endif %}
-        <button class="btn btn-light disabled float-right">Created by <a href="http://github.com/CQCumbers">CQCumbers</a></button>
+        {% endif %}
+        <button class="btn btn-light disabled float-right">
+          Created by <a href="http://github.com/CQCumbers">CQCumbers</a>
+        </button>
       </div>
     </footer>
 
     <!-- jQuery, Popper, and Bootstrap JS. -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" ></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
     <!-- Bootstrap-select, Keyboard, and Ladda JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.0-beta/js/bootstrap-select.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/keyboardjs/2.4.1/keyboard.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/spin.min.js"></script>
-    <script>
-    Ladda.bind('.ladda-button');
 
-    $('#report_modal').on('show.bs.modal', function (e) {
+    <script>
+      Ladda.bind('.ladda-button');
+
+      $('#report_modal').on('show.bs.modal', function (e) {
         var button = $(e.relatedTarget), modal = $(this);
         var question_id = button.data('id');
         $(this).find('.modal-title').text('Report Question ' + question_id);
         $(this).find('#report_id').val(question_id);
-    })
+      })
 
-    {% if current_user.is_authenticated %}
-    $('#edit_modal').on('show.bs.modal', function (e) {
+      {% if current_user.is_authenticated %}
+      $('#edit_modal').on('show.bs.modal', function (e) {
         var button = $(e.relatedTarget), modal = $(this);
         var question_id = button.data('id');
         modal.find('.modal-title').text('Edit Question ' + question_id);
         modal.find('#edit_id').val(question_id);
         $.get('{{ url_for("api.get_question", question_id=0) }}' + question_id, function(q) {
-            modal.find('#tossup_question').val(q.question.tossup_question);
-            console.log(modal.find('#tossup_question'));
-            modal.find('#tossup_answer').val(q.question.tossup_answer);
-            modal.find('#bonus_question').val(q.question.bonus_question);
-            modal.find('#bonus_answer').val(q.question.bonus_answer);
+          modal.find('#tossup_question').val(q.question.tossup_question);
+          console.log(modal.find('#tossup_question'));
+          modal.find('#tossup_answer').val(q.question.tossup_answer);
+          modal.find('#bonus_question').val(q.question.bonus_question);
+          modal.find('#bonus_answer').val(q.question.bonus_answer);
         })
-    })
-    {% endif %}
+      })
+      {% endif %}
     </script>
     {% block scripts %}{% endblock %}
   </body>
