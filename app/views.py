@@ -117,29 +117,6 @@ def search():
     return redirect(url_for('browse'))
 
 
-@app.route('/report', methods=['POST'])
-@limiter.limit('25/day; 3/minute')
-def report():
-    question_report(request.form.get('id'), request.form.get('message'))
-
-    flash('Thank you for reporting a question in need of improvement!')
-    next_url = request.args.get('next_url')
-    return redirect(next_url) if is_safe_url(next_url) else redirect(url_for('tossup'))
-
-
-def question_report(id, message):
-    return requests.post(
-        'https://api.mailgun.net/v3/scibowldb.com/messages',
-        auth=('api', app.config['MAILGUN_KEY']),
-        data={
-            'from': 'ScibowlDB User <mail@scibowldb.com>',
-            'to': app.config['ADMIN_EMAIL'],
-            'subject': 'Question {} on scibowldb reported'.format(id),
-            'text': 'Question {} was reported with the following message:\n{}'.format(id, message)
-        }
-    )
-
-
 @app.route('/login', methods=['POST'])
 @limiter.limit('10/day; 3/minute')
 def login():

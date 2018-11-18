@@ -8,10 +8,6 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # pagination
 QUESTIONS_PER_PAGE = 10;
 
-# email server
-MAILGUN_KEY = os.environ.get('MAILGUN_KEY') 
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
-
 # login stuff
 LOGIN_USERNAME = os.environ.get('LOGIN_USERNAME')
 LOGIN_PASSWORD = os.environ.get('LOGIN_PASSWORD')
