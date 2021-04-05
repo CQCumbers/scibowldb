@@ -54,7 +54,9 @@
 <p>You can also specify which sources of questions may be included by adding a list of sources to the JSON body of the <code>POST</code> request. The API will return all questions that begin with the name of the source listed. For example:</p>
 <pre>
   <code>
-curl -X POST -d '{"sources": ["Official", "CSUB"]}' "http://scibowldb.com/api/questions"
+curl -H "Content-type: application/json" \
+     -d '{"sources": ["Official", "CSUB"]}' \
+     "https://scibowldb.com/api/questions/random"
   </code>
 </pre>
 <p>will return all questions whose source names begin with "Official" or "CSUB", including "Official-set1-round1", "CSUB-round4", and "Official-set4-round10". The same POST request body sent to the <code>{{ url_for('api.get_random_question') }}</code> endpoint would return a random question following the same restrictions. The top-level sources are:</p>

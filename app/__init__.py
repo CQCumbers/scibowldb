@@ -7,6 +7,7 @@ login_manager = flask_login.LoginManager(app)
 limiter = flask_limiter.Limiter(app, key_func=flask_limiter.util.get_remote_address)
 
 from app import models, views, api
+csrf.exempt(api.api)
 app.register_blueprint(api.api)
 
 

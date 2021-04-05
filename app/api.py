@@ -39,7 +39,7 @@ def make_public(question, html=False):
 @api.route('/questions', methods=['GET'])
 def get_questions():
     questions = filter_questions().all()
-    return jsonify({'questions': [make_public(q) for q in questions]}).all()
+    return jsonify({'questions': [make_public(q) for q in questions]})
 
 
 # Filter for questions with certain attributes using post requests
